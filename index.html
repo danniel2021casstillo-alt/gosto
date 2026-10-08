@@ -805,7 +805,7 @@ const seed = () => [
   { name:'Gaseosa 400ml',       desc:'Con mucho hielo',                        price:4000,  cat:'Otros',        available:true,  img:'photo-1574706226623-e5cc0da928c6' },
 ];
 
-const S = { products:[], orders:[], cfg:null, user:null, ready:false, unsub:null, initError:'' };
+const S = { products:[], orders:[], cfg:null, user:null, ready:false, unsub:null, initError:'', ordersError:'' };
 let cart = {};
 try { cart = JSON.parse(localStorage.getItem(KCAR) || '{}') || {}; } catch(e){ cart = {}; }
 const saveCart = () => localStorage.setItem(KCAR, JSON.stringify(cart));
@@ -1005,10 +1005,16 @@ const Store = {
       if(this.unsub) this.unsub();
       this.unsub = this.fdb.collection('orders').orderBy('ts','desc').onSnapshot(
         snap => {
+          S.ordersError = '';
           S.orders = snap.docs.map(d => ({ id:d.id, ...d.data() }));
           cb(S.orders);
         },
-        err => { console.warn('orders snapshot:', err); }
+        err => {
+          console.warn('orders snapshot:', err);
+          S.ordersError = (err && (err.message || err.code || String(err))) || 'No se pudieron leer los pedidos';
+          if(isAdmin && adminOK) toast('⚠ Error al leer pedidos: ' + S.ordersError, 'err');
+          cb([]);
+        }
       );
     } else {
       cb(S.orders);
@@ -1671,6 +1677,12 @@ function filteredOrders(){
 const itemsList = its => `<div class="items">${its.map(i => `<span class="mut"><b>${i.qty}×</b> ${esc(i.name)}</span>`).join('')}</div>`;
 function ordersHTML(){
   const shown = filteredOrders();
+  if(S.ordersError) return `<div class="empty" style="border:1px solid var(--bad)">
+    <span class="ico">⚠️</span>
+    <h3>No se pudieron leer los pedidos</h3>
+    <p style="white-space:pre-wrap">${esc(S.ordersError)}</p>
+    <p style="font-size:12px;color:var(--muted-2)">Revisa que en Firebase → Firestore → Reglas el correo del admin esté publicado, y que el dominio de GitHub Pages esté en Authentication → Authorized domains.</p>
+  </div>`;
   if(!shown.length) return `<div class="empty"><span class="ico">📭</span>
     <h3>${S.orders.length?'Sin pedidos en este filtro':'Aún no hay pedidos'}</h3>
     <p>${S.orders.length?'Prueba con otro estado.':'Cuando alguien haga un pedido aparecerá aquí al instante.'}</p></div>`;
