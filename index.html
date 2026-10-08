@@ -1449,7 +1449,10 @@ async function confirmOrder(){
 
   const btn = $('.sheet button[type=submit]');
   const metodo = (document.querySelector('input[name="pago"]:checked')||{}).value || 'nequi';
-  const items = Object.entries(cart).map(([id,q]) => { const p = prod(id); return { id, name:p.name, price:p.price, qty:q }; });
+  const items = Object.entries(cart).map(([id,q]) => {
+    const p = prod(id) || {};
+    return { id, name:String(p.name||'Producto'), price:Math.max(0, Math.round(Number(p.price)||0)), qty:q };
+  });
 
   if(btn){ btn.disabled = true; btn.innerHTML = `<span class="spin"></span> Enviando…`; }
   let pedido;
@@ -1463,7 +1466,14 @@ async function confirmOrder(){
   }catch(e){
     console.error(e);
     if(btn){ btn.disabled = false; btn.textContent = 'Enviar pedido'; }
-    toast('No se pudo enviar: ' + (e.message||e), 'err');
+    const msg = (e && (e.message || String(e))) || '';
+    /* Un error de permisos casi siempre significa que las REGLAS de Firestore
+       no estan publicadas o el correo del admin no coincide con ellas. */
+    if(/permission|insufficient/i.test(msg) || e && e.code === 'permission-denied'){
+      toast('No se pudo enviar: revisa que las REGLAS de Firestore estén publicadas con tu correo exacto', 'err');
+    }else{
+      toast('No se pudo enviar: ' + msg, 'err');
+    }
     return;
   }
 
