@@ -906,12 +906,16 @@ const Store = {
   async initFirestore(){
     try{
       await new Promise((ok,no) => {
-        let n = 0;
-        const done = () => (++n === 3) ? ok() : 0;
+        let n = 0, settled = false;
+        const fail = m => { if(!settled){ settled = true; no(new Error(m)); } };
+        /* si el CDN se queda colgado, no bloqueamos la tienda entera */
+        const timer = setTimeout(() => fail('Firebase tardó demasiado en cargar'), 12000);
+        const done = () => { if(++n === 3 && !settled){ settled = true; clearTimeout(timer); ok(); } };
         for(const f of ['firebase-app-compat.js','firebase-firestore-compat.js','firebase-auth-compat.js']){
           const s = document.createElement('script');
           s.src = SDK + f; s.async = true;
-          s.onload = done; s.onerror = () => no(new Error('No se pudo descargar ' + f + ' (revisa tu conexión)'));
+          s.onload = done;
+          s.onerror = () => { clearTimeout(timer); fail('No se pudo descargar ' + f + ' (revisa tu conexión)'); };
           document.head.appendChild(s);
         }
       });
@@ -920,28 +924,44 @@ const Store = {
       this.fauth = firebase.auth();
       this.fdb.settings({ ignoreUndefinedProperties: true });
 
-      /* siembra la primera vez */
-      const cfgRef = this.fdb.collection('config').doc('main');
-      const snap = await cfgRef.get();
-      if(!snap.exists){
-        const batch = this.fdb.batch();
-        batch.set(cfgRef, { negocio:NEGOCIO_DEF, pago:PAGO_DEF });
-        seed().forEach((p,i) => batch.set(this.fdb.collection('products').doc('p'+(i+1)), { ...clean(p), ts:i }));
-        await batch.commit();
-      }
-
-      this.fauth.onAuthStateChanged(u => {
-        S.user = u;
-        const was = adminOK;
-        adminOK = !!u;
-        if(u && isAdmin){ render(); startWatch(); if(!was) toast('Sesión iniciada: ' + (u.email||'')); }
-        if(!u && isAdmin){ adminOK = false; render(); }
+      /* Las reglas solo permiten escribir el catálogo siendo admin, así
+         que la siembra NO puede hacerse aquí (aún no hay sesión): antes
+         esto lanzaba permission-denied y toda la app caía a modo local.
+         Ahora se espera a la sesión y se siembra en maybeSeed(). */
+      await new Promise(ok => {
+        this.fauth.onAuthStateChanged(u => {
+          S.user = u;
+          const was = adminOK;
+          adminOK = !!u;
+          const after = (u && isAdmin)
+            ? this.maybeSeed().catch(err => console.warn('siembra:', err))
+            : Promise.resolve();
+          after.then(() => {
+            if(u && isAdmin){ render(); startWatch(); if(!was) toast('Sesión iniciada: ' + (u.email||'')); }
+            if(!u && isAdmin){ adminOK = false; render(); }
+            ok();
+          });
+        });
       });
     }catch(e){
       this.mode = 'local'; S.initError = e.message || String(e);
       await this.initLocal();
       toast('Sin conexión a Firebase: modo local', 'err');
     }
+  },
+
+  /* Siembra inicial: solo la hace el administrador ya autenticado,
+     porque las reglas exigen ser admin para escribir catálogo/config.
+     Se ejecuta una sola vez (si config/main no existe todavía). */
+  async maybeSeed(){
+    if(this.mode !== 'firestore' || !this.fauth.currentUser) return;
+    const cfgRef = this.fdb.collection('config').doc('main');
+    const snap = await cfgRef.get();
+    if(snap.exists) return;                       // ya sembrado
+    const batch = this.fdb.batch();
+    batch.set(cfgRef, { negocio:NEGOCIO_DEF, pago:PAGO_DEF });
+    seed().forEach((p,i) => batch.set(this.fdb.collection('products').doc('p'+(i+1)), { ...clean(p), ts:i }));
+    await batch.commit();
   },
 
   /* ---------- LOCAL ---------- */
@@ -964,6 +984,11 @@ const Store = {
     if(this.mode === 'firestore'){
       const s = await this.fdb.collection('products').orderBy('ts').get();
       S.products = s.docs.map(d => ({ id:d.id, ...d.data() }));
+      /* Si la nube está vacía (el admin aún no ha entrado para sembrar
+         el catálogo), mostramos el menú de ejemplo en vez de una tienda
+         en blanco. No se escribe nada: eso lo hace maybeSeed() al
+         iniciar sesión. */
+      if(!S.products.length) S.products = seed().map((p,i) => ({ id:'p'+(i+1), ...p }));
     }
   },
   async loadConfig(){
