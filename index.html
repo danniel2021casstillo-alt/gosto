@@ -1493,19 +1493,25 @@ function trackingSteps(status){
     </div>`;
   }).join('');
 }
-async function buscarTracking(folio){
+async function buscarTracking(folioRaw){
+  /* limpiar el símbolo # si el usuario lo escribió */
+  const folio = String(folioRaw).replace(/#/g,'').trim();
+  if(!folio) return null;
+  const folioNum = parseInt(folio, 10);
+  if(isNaN(folioNum)) return null;
+
   if(Store.mode !== 'firestore'){
     /* modo local: buscar en S.orders */
-    const o = S.orders.find(x => x.folio == folio);
+    const o = S.orders.find(x => x.folio == folioNum);
     if(o) return { folio:o.folio, status:o.status, total:o.total, metodo:o.metodo, name:o.name, date:o.date };
     return null;
   }
   try{
-    const snap = await Store.fdb.collection('tracking').doc(String(folio)).get();
+    const snap = await Store.fdb.collection('tracking').doc(String(folioNum)).get();
     if(snap.exists) return snap.data();
-    /* fallback: intentar leer directamente de orders por folio (solo si las reglas lo permiten) */
+    /* fallback: intentar leer directamente de orders por folio */
     try{
-      const q = await Store.fdb.collection('orders').where('folio', '==', parseInt(folio)).limit(1).get();
+      const q = await Store.fdb.collection('orders').where('folio', '==', folioNum).limit(1).get();
       if(!q.empty){
         const d = q.docs[0].data();
         return { folio:d.folio, status:d.status, total:d.total, metodo:d.metodo, name:d.name, date:d.date };
@@ -1524,7 +1530,7 @@ function trackingView(){
   sessionStorage.removeItem('gosto_tracking_folio');
   const tieneFolio = folioParam ? `
     <div class="input-group">
-      <input id="t_folio" type="number" inputmode="numeric" placeholder="Ej. 1001" value="${esc(folioParam)}" min="1000">
+      <input id="t_folio" type="text" inputmode="text" placeholder="Ej. #1042 o 1042" value="${esc(folioParam)}" maxlength="10">
       <button class="btn gold" data-act="buscartracking">${I.check} Consultar</button>
     </div>
     <div id="trackingResult" style="margin-top:20px"></div>
@@ -1533,7 +1539,7 @@ function trackingView(){
       <p>Ingresa tu número de folio para consultar el estado de tu pedido.</p>
     </div>
     <div class="input-group" style="margin-top:20px">
-      <input id="t_folio" type="number" inputmode="numeric" placeholder="Ej. 1001" min="1000">
+      <input id="t_folio" type="text" inputmode="text" placeholder="Ej. #1042 o 1042" min="1000" maxlength="10">
       <button class="btn gold" data-act="buscartracking">${I.check} Consultar</button>
     </div>
     <div id="trackingResult" style="margin-top:20px"></div>
@@ -2452,7 +2458,8 @@ document.addEventListener('click', async e => {
     case 'admin': goAdmin(); break;
     case 'tracking': location.hash = '#tracking'; break;
     case 'buscartracking': {
-      const folio = $('#t_folio')?.value;
+      const folioRaw = $('#t_folio')?.value;
+      const folio = String(folioRaw).replace(/#/g,'').trim();
       if(!folio){ toast('Escribe el número de folio','err'); return; }
       const btn = document.querySelector('[data-act="buscartracking"]');
       const box = $('#trackingResult');
