@@ -529,6 +529,19 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 .pay-num.copied{border-color:var(--ok);box-shadow:0 0 0 10px rgba(63,125,92,.18),0 4px 14px rgba(200,155,60,.18)}
 .pay-num:focus-visible{outline:3px solid var(--oro-light);outline-offset:3px;border-radius:8px}
 
+/* teléfono con código de país */
+.phone-row{display:flex;gap:8px;align-items:center}
+.phone-row select.inp{max-width:115px;flex:none;padding:12px 10px;background:var(--paper);color:var(--vino)}
+.phone-row select.inp option{background:var(--paper);color:var(--vino)}
+
+/* selector de apps de pago */
+.app-pay-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-top:14px}
+.app-pay{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 10px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--paper);cursor:pointer;transition:all .2s var(--ease)}
+.app-pay:hover{border-color:var(--oro);background:var(--cream-2);transform:translateY(-2px);box-shadow:var(--sh-1)}
+.app-pay .ic{font-size:26px}
+.app-pay .nom{font-size:11.5px;font-weight:700;color:var(--vino-deep);text-align:center}
+.app-pay.hidden{display:none}
+
 /* botón copiar dorado */
 .paycopy{
   flex:none;display:inline-flex;align-items:center;gap:8px;
@@ -1741,7 +1754,18 @@ function openForm(){
       <div class="field"><label for="f_name">Nombre completo *</label>
         <input class="inp" id="f_name" autocomplete="name" placeholder="¿Cómo te llamas?"></div>
       <div class="field"><label for="f_phone">Teléfono / WhatsApp *</label>
-        <input class="inp" id="f_phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="300 000 0000">
+        <div class="phone-row">
+          <select class="inp" id="f_country">
+            <option value="+57" selected>+57 Colombia</option>
+            <option value="+52">+52 México</option>
+            <option value="+54">+54 Argentina</option>
+            <option value="+56">+56 Chile</option>
+            <option value="+51">+51 Perú</option>
+            <option value="+1">+1 EE. UU.</option>
+            <option value="+34">+34 España</option>
+          </select>
+          <input class="inp" id="f_phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="300 000 0000">
+        </div>
         <div class="hint">Te escribimos por aquí para confirmar la entrega.</div></div>
       <div class="field"><label for="f_entrega">Entrega</label>
         <select class="inp" id="f_entrega">
@@ -1828,6 +1852,31 @@ function abrirNequi(telefono, monto){
   }, 1500);
 }
 
+function toggleAppPay(){
+  const grid = $('#appPayGrid');
+  if(!grid) return;
+  grid.style.display = grid.style.display === 'none' ? 'grid' : 'none';
+}
+
+function abrirAppPago(app, telefono, monto){
+  const tel = String(telefono).replace(/\D/g,'');
+  const amount = Math.round(monto);
+  let url = '';
+  switch(app){
+    case 'nequi': url = `nequi://pay?phone=${tel}&amount=${amount}`; break;
+    case 'daviplata': url = `daviplata://pay?phone=${tel}&amount=${amount}`; break;
+    case 'bancolombia': url = `bancolombia://pay?phone=${tel}&amount=${amount}`; break;
+    case 'pse': url = `https://pse.com.co`; break;
+    default: url = `https://wa.me/${tel}`; break;
+  }
+  const win = window.open(url, '_blank');
+  setTimeout(() => {
+    if(!win || win.closed){
+      window.open(`https://wa.me/${tel}`, '_blank');
+    }
+  }, 1500);
+}
+
 async function confirmOrder(){
   if(!disponibilidad().abierto){ toast('En este momento estamos cerrados','err'); closeSheet(); return; }
   const name = $('#f_name'), phone = $('#f_phone');
@@ -1863,7 +1912,7 @@ async function confirmOrder(){
   try{
     pedido = await Store.createOrder({
       folio:0, date:new Date().toISOString(), ts:Date.now(),
-      name:name.value.trim().slice(0,80), phone:phone.value.trim().slice(0,30),
+      name:name.value.trim().slice(0,80), phone:($('#f_country').value + phone.value.trim()).slice(0,30),
       entrega, notas:$('#f_notas').value.trim().slice(0,240), lat, lng,
       metodo, items, total:cartTotal(), status:'Pendiente',
     });
@@ -1903,6 +1952,15 @@ async function confirmOrder(){
         </div>
         ${pg.nombre ? `<p class="own">A nombre de <b>${esc(pg.nombre)}</b></p>` : ''}
         <p class="hint">Toca el número o “Copiar” para pegarlo en tu app de pagos.</p>
+        <div class="app-pay-selector" style="margin-top:14px">
+          <button class="btn gold block" onclick="toggleAppPay()">${I.phone} Elegir app de pago</button>
+          <div class="app-pay-grid" id="appPayGrid" style="display:none">
+            <label class="app-pay" onclick="abrirAppPago('nequi', '${pg.numero}', ${pedido.total})"><span class="ic">📱</span><span class="nom">Nequi</span></label>
+            <label class="app-pay" onclick="abrirAppPago('daviplata', '${pg.numero}', ${pedido.total})"><span class="ic">💳</span><span class="nom">DaviPlata</span></label>
+            <label class="app-pay" onclick="abrirAppPago('bancolombia', '${pg.numero}', ${pedido.total})"><span class="ic">🏦</span><span class="nom">Bancolombia</span></label>
+            <label class="app-pay" onclick="abrirAppPago('pse', '${pg.numero}', ${pedido.total})"><span class="ic">🌐</span><span class="nom">PSE</span></label>
+          </div>
+        </div>
       </div>
       <p>Manda el comprobante por WhatsApp para que iniciemos tu pedido al instante.</p>
       <div class="sheet-foot">
