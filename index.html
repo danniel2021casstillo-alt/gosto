@@ -556,11 +556,6 @@ body::before{
   100%{opacity:.85}
 }
 
-/* mensaje de cobertura / perímetro */
-.coverage{padding:10px 14px;border-radius:var(--r-sm);font-size:12.5px;margin-top:10px;display:flex;align-items:center;gap:8px;line-height:1.4}
-.coverage-in{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok)}
-.coverage-out{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad)}
-
 /* marco dorado sutil alrededor del contenido principal */
 .wrap{position:relative}
 .wrap::after{
@@ -568,6 +563,58 @@ body::before{
   background:linear-gradient(135deg,rgba(200,155,60,.09),transparent,rgba(200,155,60,.05));
   pointer-events:none;z-index:0;opacity:.7;
 }
+
+/* seguimiento de pedido */
+.tracking{text-align:center;max-width:460px;margin:0 auto;min-height:60vh;display:flex;flex-direction:column}
+.tracking section{background:linear-gradient(160deg,#4A0A18 0%,#2B050D 100%);border-radius:var(--r-lg);padding:32px 20px 40px;box-shadow:0 20px 60px rgba(20,2,6,.45),0 0 40px rgba(200,155,60,.15);position:relative;overflow:hidden;color:#fff}
+.tracking section::before{content:'';position:absolute;top:-20%;right:-20%;width:300px;height:300px;background:radial-gradient(circle at 80% 30%,rgba(200,155,60,.2),transparent 55%);pointer-events:none;z-index:0}
+.tracking section::after{content:'';position:absolute;bottom:-20%;left:-10%;width:260px;height:260px;background:radial-gradient(circle at 30% 70%,rgba(200,155,60,.15),transparent 55%);pointer-events:none;z-index:0}
+.tracking .logo-track{width:64px;height:64px;border-radius:50%;border:3px solid var(--oro);background:var(--vino-deep);margin:0 auto 14px;box-shadow:0 0 20px rgba(200,155,60,.35)}
+.tracking h2{font-size:1.6rem;margin-bottom:4px;color:#fff;position:relative;z-index:1}
+.tracking .sub{color:var(--oro-pale);font-size:13px;margin-bottom:24px;position:relative;z-index:1}
+.tracking .input-group{display:flex;gap:8px;margin-bottom:28px;position:relative;z-index:1}
+.tracking .input-group input{flex:1;padding:12px 14px;border:1.5px solid var(--oro);border-radius:var(--r-sm);background:rgba(255,255,255,.08);font-size:14px;color:#fff}
+.tracking .input-group input::placeholder{color:rgba(255,255,255,.55)}
+.tracking .input-group input:focus{border-color:var(--oro-light);box-shadow:0 0 0 4px rgba(200,155,60,.25);outline:0;background:rgba(255,255,255,.12)}
+.tracking .input-group .btn{padding:0 20px;min-height:auto;height:46px;background:linear-gradient(135deg,#F0D98C,var(--oro));color:var(--vino-deep);font-weight:800;border:none;box-shadow:0 6px 16px rgba(200,155,60,.4)}
+.tracking .input-group .btn:hover{filter:brightness(1.08);transform:translateY(-2px);box-shadow:0 10px 24px rgba(200,155,60,.55)}
+
+/* tarjeta de estado mejorada */
+.tracking .estado-card{margin-top:0;padding:26px 22px;border-radius:var(--r-lg);background:linear-gradient(160deg,#fffdf9 0%,var(--cream-2) 50%,var(--paper) 100%);border:2px solid var(--oro);box-shadow:0 16px 44px rgba(20,2,6,.22),var(--sh-glow);animation:fadeUp .5s .2s var(--ease-out) both;position:relative;overflow:hidden}
+.tracking .estado-card::before{content:'';position:absolute;top:-30%;left:-30%;width:260px;height:260px;background:radial-gradient(circle at 40% 40%,rgba(200,155,60,.25),transparent 60%);pointer-events:none;z-index:0;animation:float 8s ease-in-out infinite}
+.tracking .estado-card > *{position:relative;z-index:1}
+.tracking .estado-card h3{font-size:1.4rem;margin-bottom:6px;color:var(--vino-deep)}
+.tracking .estado-card p{color:var(--muted);font-size:13px;margin:4px 0}
+.tracking .estado-card p strong{color:var(--vino)}
+.tracking .badge-estado{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:var(--r-full);font-weight:800;font-size:13px;margin:16px 0 22px;letter-spacing:.05em;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.tracking .badge-estado.warn{background:var(--warn-bg);color:var(--warn);border:1px solid rgba(138,100,23,.45)}
+.tracking .badge-estado.info{background:var(--info-bg);color:var(--info);border:1px solid rgba(47,107,143,.45)}
+.tracking .badge-estado.ok{background:var(--ok-bg);color:var(--ok);border:1px solid rgba(63,125,92,.45)}
+.tracking .badge-estado.bad{background:var(--bad-bg);color:var(--bad);border:1px solid rgba(178,58,46,.45)}
+.tracking .tracking-steps{display:flex;justify-content:space-between;margin-top:22px;position:relative}
+.tracking .tracking-steps::before{content:'';position:absolute;top:14px;left:0;right:0;height:4px;background:var(--line-2);z-index:0;border-radius:2px}
+.tracking .step{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;flex:1}
+.tracking .step .dot{width:24px;height:24px;border-radius:50%;background:var(--paper);border:3px solid var(--line-2);margin-bottom:8px;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.tracking .step .dot.active{background:var(--oro);border-color:var(--oro-light);box-shadow:0 0 0 8px rgba(200,155,60,.35)}
+.tracking .step .dot.done{background:var(--ok);border-color:var(--ok-light);box-shadow:0 0 0 8px rgba(63,125,92,.25)}
+.tracking .step .dot.done::after{content:'✔';color:#fff;font-size:11px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-weight:800}
+.tracking .step label{font-size:10.5px;color:var(--muted);text-align:center;letter-spacing:.03em;line-height:1.2}
+.tracking .step.done label{color:var(--ok);font-weight:800}
+.tracking .step.active label{color:var(--oro);font-weight:800}
+.tracking .step-text{font-size:11px;color:var(--muted-2);margin-top:5px;line-height:1.3}
+
+/* estado vacío / no encontrado mejorado */
+.tracking .empty{padding:40px 20px;color:#fff}
+.tracking .empty .ico{font-size:56px;margin-bottom:14px;display:block}
+.tracking .empty h3{color:#fff;margin-bottom:8px;font-size:1.25rem}
+.tracking .empty p{color:var(--oro-pale);font-size:13.5px;max-width:36ch;margin:0 auto}
+
+.tracking .volver-menu{margin-top:26px;display:inline-block;position:relative;z-index:1}
+.tracking .volver-menu a{color:var(--oro-pale);font-weight:700;text-decoration:none;font-size:13px}
+
+/* estado inactivo / sin buscar aún */
+.tracking .sin-resultados{text-align:center;padding:30px 16px;color:var(--oro-pale)}
+.tracking .sin-resultados p{font-size:13px;margin:0;color:var(--oro-pale)}
 .confirm .btn{animation:fadeUp .5s .7s var(--ease-out) both}
 
 /* ============ 14. TOASTS ============ */
@@ -1230,6 +1277,17 @@ const Store = {
         await oRef.set(rec);
       }
       rec.id = oRef.id;
+      /* escribir en colección pública de seguimiento para que el cliente consulte su estado */
+      try{
+        await this.fdb.collection('tracking').doc(String(rec.folio)).set({
+          folio: rec.folio,
+          status: rec.status,
+          total: rec.total,
+          metodo: rec.metodo,
+          name: rec.name,
+          date: rec.date
+        });
+      }catch(e){ console.warn('tracking:', e); }
     } else {
       rec.id = uid();
       rec.folio = 1000 + Math.floor(Math.random()*9000);
@@ -1239,8 +1297,18 @@ const Store = {
     return rec;
   },
   async updateOrder(id, patch){
-    if(this.mode === 'firestore') await this.fdb.collection('orders').doc(id).update(patch);
-    else {
+    if(this.mode === 'firestore'){
+      await this.fdb.collection('orders').doc(id).update(patch);
+      /* actualizar tracking si cambió el estado */
+      if(patch.status){
+        const o = S.orders.find(x => x.id === id);
+        if(o){
+          try{
+            await this.fdb.collection('tracking').doc(String(o.folio)).update({ status: patch.status });
+          }catch(e){ console.warn('tracking update:', e); }
+        }
+      }
+    } else {
       const o = S.orders.find(x => x.id === id);
       if(o) Object.assign(o, patch);
       this.saveLocal(); this.notifyLocal();
@@ -1296,6 +1364,7 @@ const I = {
   trash:'<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-.8 14a2 2 0 0 1-2 1.9H7.8a2 2 0 0 1-2-1.9L5 6"/></svg>',
   dl:'<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>',
   ul:'<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg>',
+  tracking:'<svg viewBox="0 0 24 24"><path d="M3 4v16l21-2l-2-18zM3 4l14 1M17 4l14 1"/></svg>',
   back:'<svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>',
   phone:'<svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>',
   live:'<svg viewBox="0 0 24 24"><path d="M2 12h4l3-8 4 16 3-8h6"/></svg>',
@@ -1354,7 +1423,8 @@ document.addEventListener('keydown', e => {
 function render(){
   const y = window.scrollY;
   const abierto=disponibilidad().abierto;
-  $('#app').innerHTML = !S.ready ? bootView() : isAdmin ? (adminOK ? adminView() : loginView()) : abierto ? storeView() : closedView();
+  const isTracking = location.hash === '#tracking';
+  $('#app').innerHTML = !S.ready ? bootView() : isAdmin ? (adminOK ? adminView() : loginView()) : isTracking ? trackingView() : abierto ? storeView() : closedView();
   scrollTop(y);
   if(S.ready) afterRender();
 }
@@ -1384,6 +1454,69 @@ function closedView(){
     <a class="btn gold" href="https://wa.me/${WHATSAPP_NEGOCIO}" target="_blank" rel="noopener">Consultar por WhatsApp</a>
     <p style="margin-top:22px"><a class="mut" href="#admin">Acceso de administración</a></p>
   </section></main>`;
+}
+
+/* ═══════════════ SEGUIMIENTO DE PEDIDO ═══════════════ */
+function statusBadgeClass(st){
+  return st==='Pendiente' ? 'warn' : st==='Confirmado' ? 'info' : st==='Entregado' ? 'ok' : 'bad';
+}
+function statusLabel(st){
+  return st==='Pendiente' ? 'Pendiente' : st==='Confirmado' ? 'Confirmado' : st==='Entregado' ? 'Entregado' : 'Cancelado';
+}
+function trackingSteps(status){
+  const order = ['Pendiente','Confirmado','Entregado'];
+  return order.map((s,i) => {
+    const done = order.indexOf(status) > i;
+    const active = order.indexOf(status) === i;
+    return `<div class="step ${done?'done':''}${active?' active':''}">
+      <div class="dot ${done?'done':''}${active?' active':''}">${done?'✔':''}</div>
+      <label>${s}</label>
+      <div class="step-text">${done?'Listo':active?'En proceso':'Pendiente'}</div>
+    </div>`;
+  }).join('');
+}
+async function buscarTracking(folio){
+  if(Store.mode !== 'firestore'){
+    /* modo local: buscar en S.orders */
+    const o = S.orders.find(x => x.folio == folio);
+    return o ? { folio:o.folio, status:o.status, total:o.total, metodo:o.metodo, name:o.name, date:o.date } : null;
+  }
+  try{
+    const snap = await Store.fdb.collection('tracking').doc(String(folio)).get();
+    return snap.exists ? snap.data() : null;
+  }catch(e){
+    console.warn('tracking read:', e);
+    return null;
+  }
+}
+function trackingView(){
+  const folioParam = new URLSearchParams(location.search).get('folio') || sessionStorage.getItem('gosto_tracking_folio') || '';
+  sessionStorage.removeItem('gosto_tracking_folio');
+  const tieneFolio = folioParam ? `
+    <div class="input-group">
+      <input id="t_folio" type="number" inputmode="numeric" placeholder="Ej. 1001" value="${esc(folioParam)}" min="1000">
+      <button class="btn gold" data-act="buscartracking">${I.check} Consultar</button>
+    </div>
+    <div id="trackingResult" style="margin-top:20px"></div>
+  ` : `
+    <div class="sin-resultados">
+      <p>Ingresa tu número de folio para consultar el estado de tu pedido.</p>
+    </div>
+    <div class="input-group" style="margin-top:20px">
+      <input id="t_folio" type="number" inputmode="numeric" placeholder="Ej. 1001" min="1000">
+      <button class="btn gold" data-act="buscartracking">${I.check} Consultar</button>
+    </div>
+    <div id="trackingResult" style="margin-top:20px"></div>
+  `;
+  return `<main class="wrap tracking">
+    <section class="section">
+      <img src="data:image/png;base64,${LOGO}" alt="Logo" class="logo-track">
+      <h2>Seguir mi pedido</h2>
+      <p class="sub">Ingresa tu número de folio para consultar el estado en tiempo real.</p>
+      ${tieneFolio}
+      <p style="margin-top:26px"><a class="mut" href="#menu">← Volver al menú</a></p>
+    </section>
+  </main>`;
 }
 
 /* ═══════════════ TIENDA ═══════════════ */
@@ -1468,6 +1601,7 @@ function storeView(){
     </div>
     <div class="flinks">
       <button class="linkbtn" data-act="wa">${I.phone} Contacto</button>
+      <button class="linkbtn" data-act="tracking">${I.tracking} Seguir mi pedido</button>
       <button class="linkbtn" data-act="admin">${I.gear} Panel admin</button>
     </div>
   </div></footer>`;
@@ -1682,6 +1816,18 @@ function openForm(){
   actualizarCobertura(); /* estado inicial */
 }
 
+/* intenta abrir la app Nequi; si no se abre, abre WhatsApp como fallback */
+function abrirNequi(telefono, monto){
+  const tel = String(telefono).replace(/\D/g,'');
+  const url = `nequi://pay?phone=${tel}&amount=${Math.round(monto)}`;
+  const win = window.open(url, '_blank');
+  setTimeout(() => {
+    if(!win || win.closed){
+      window.open(`https://wa.me/${tel}`, '_blank');
+    }
+  }, 1500);
+}
+
 async function confirmOrder(){
   if(!disponibilidad().abierto){ toast('En este momento estamos cerrados','err'); closeSheet(); return; }
   const name = $('#f_name'), phone = $('#f_phone');
@@ -1760,7 +1906,9 @@ async function confirmOrder(){
       </div>
       <p>Manda el comprobante por WhatsApp para que iniciemos tu pedido al instante.</p>
       <div class="sheet-foot">
+        ${pedido.metodo === 'nequi' ? `<button class="btn gold block" onclick="abrirNequi('${pg.numero}', ${pedido.total})">${I.phone} Abrir Nequi para pagar</button>` : ''}
         <a class="btn gold block" href="${whatsappPedido(pedido)}" target="_blank" rel="noopener">${I.phone} Enviar comprobante por WhatsApp</a>
+        <button class="btn ghost block" onclick="sessionStorage.setItem('gosto_tracking_folio','${pedido.folio}'); location.hash='#tracking'">${I.tracking} Ver seguimiento</button>
         <button class="btn ghost block" data-act="close">Listo, gracias</button>
       </div>
     </div>`, { label:'Pedido confirmado', center:true });
@@ -2226,6 +2374,36 @@ document.addEventListener('click', async e => {
       break;
     }
     case 'admin': goAdmin(); break;
+    case 'tracking': location.hash = '#tracking'; break;
+    case 'buscartracking': {
+      const folio = $('#t_folio')?.value;
+      if(!folio){ toast('Escribe el número de folio','err'); return; }
+      const btn = document.querySelector('[data-act="buscartracking"]');
+      if(btn){ btn.disabled = true; btn.innerHTML = `<span class="spin"></span> Buscando…`; }
+      buscarTracking(folio).then(res => {
+        if(btn){ btn.disabled = false; btn.innerHTML = `${I.check} Consultar`; }
+        const box = $('#trackingResult');
+        if(!res){
+          box.innerHTML = `<div class="empty"><span class="ico">⚠️</span><h3>No se encontró el pedido #${folio}</h3><p>Verifica que el número de folio sea correcto.</p></div>`;
+          return;
+        }
+        const cls = statusBadgeClass(res.status);
+        box.innerHTML = `
+          <div class="estado-card">
+            <h3>Pedido #${res.folio}</h3>
+            <p><strong>Cliente:</strong> ${esc(res.name)}</p>
+            <p><strong>Total:</strong> ${money(res.total)}</p>
+            <p><strong>Método:</strong> ${esc(res.metodo)}</p>
+            <p><strong>Fecha:</strong> ${fmtDate(res.date)}</p>
+            <div class="badge-estado ${cls}">${statusLabel(res.status)}</div>
+            <div class="tracking-steps">${trackingSteps(res.status)}</div>
+          </div>`;
+      }).catch(e => {
+        if(btn){ btn.disabled = false; btn.innerHTML = `${I.check} Consultar`; }
+        toast('No se pudo consultar el pedido','err');
+      });
+      break;
+    }
     case 'store': goStore(); break;
     case 'logout': await logout(); break;
     case 'login': await doLogin(); break;
@@ -2303,10 +2481,11 @@ document.addEventListener('keydown', e => {
 });
 
 window.addEventListener('hashchange', () => {
-  const to = location.hash === '#admin';
-  if(to === isAdmin) return;
-  isAdmin = to;
-  adminOK = S.user ? true : sessionStorage.getItem('gosto_admin') === '1';
+  const toAdmin = location.hash === '#admin';
+  const toTracking = location.hash === '#tracking';
+  if(toAdmin === isAdmin && !toTracking) return;
+  isAdmin = toAdmin;
+  adminOK = toAdmin ? (S.user ? true : sessionStorage.getItem('gosto_admin') === '1') : false;
   closeSheet(true); render(); scrollTop(0); startWatch();
 });
 
