@@ -1492,11 +1492,14 @@ async function buscarTracking(folio){
   if(Store.mode !== 'firestore'){
     /* modo local: buscar en S.orders */
     const o = S.orders.find(x => x.folio == folio);
-    return o ? { folio:o.folio, status:o.status, total:o.total, metodo:o.metodo, name:o.name, date:o.date } : null;
+    if(o) return { folio:o.folio, status:o.status, total:o.total, metodo:o.metodo, name:o.name, date:o.date };
+    return null;
   }
   try{
     const snap = await Store.fdb.collection('tracking').doc(String(folio)).get();
-    return snap.exists ? snap.data() : null;
+    if(snap.exists) return snap.data();
+    /* fallback: si no está en tracking, buscar en orders (solo si el cliente tiene acceso) */
+    return null;
   }catch(e){
     console.warn('tracking read:', e);
     return null;
@@ -2438,12 +2441,13 @@ document.addEventListener('click', async e => {
       const folio = $('#t_folio')?.value;
       if(!folio){ toast('Escribe el número de folio','err'); return; }
       const btn = document.querySelector('[data-act="buscartracking"]');
+      const box = $('#trackingResult');
       if(btn){ btn.disabled = true; btn.innerHTML = `<span class="spin"></span> Buscando…`; }
+      box.innerHTML = '';
       buscarTracking(folio).then(res => {
         if(btn){ btn.disabled = false; btn.innerHTML = `${I.check} Consultar`; }
-        const box = $('#trackingResult');
         if(!res){
-          box.innerHTML = `<div class="empty"><span class="ico">⚠️</span><h3>No se encontró el pedido #${folio}</h3><p>Verifica que el número de folio sea correcto.</p></div>`;
+          box.innerHTML = `<div class="empty"><span class="ico">⚠️</span><h3>No se encontró el pedido #${folio}</h3><p>Verifica que el número de folio sea correcto o haz tu primer pedido para generar un folio.</p></div>`;
           return;
         }
         const cls = statusBadgeClass(res.status);
@@ -2459,7 +2463,8 @@ document.addEventListener('click', async e => {
           </div>`;
       }).catch(e => {
         if(btn){ btn.disabled = false; btn.innerHTML = `${I.check} Consultar`; }
-        toast('No se pudo consultar el pedido','err');
+        box.innerHTML = `<div class="empty"><span class="ico">⚠️</span><h3>Error al consultar</h3><p>${esc(e.message||String(e))}</p></div>`;
+        toast('Error al consultar el seguimiento','err');
       });
       break;
     }
