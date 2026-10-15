@@ -1926,14 +1926,14 @@ async function confirmOrder(){
       /* Pop-up tipo POS UP: mensaje de distancia excedida */
       showSheet(`${sheetHead('⚠️ Fuera de zona de entrega')}
         <div style="text-align:center;padding:10px 0">
-          <div style="font-size:48px;margin-bottom:12px">📍</div>
-          <h3 style="color:var(--bad);margin-bottom:8px">No podemos llevar a domicilio</h3>
-          <p style="color:var(--muted);margin-bottom:16px">
+          <div style="font-size:52px;margin-bottom:14px">📍</div>
+          <h3 style="color:var(--bad);margin-bottom:10px">No es posible el pedido a domicilio</h3>
+          <p style="color:var(--muted);margin-bottom:18px;line-height:1.5">
             Tu ubicación está a <b>${d.toFixed(1)} km</b> del punto de referencia.<br>
-            El radio máximo para domicilio es <b>${RADIO_MAX_KM} km</b>.
+            El radio máximo de entrega es <b>${RADIO_MAX_KM} km</b> a la redonda.
           </p>
-          <div style="background:var(--warn-bg);border:1px solid var(--warn);border-radius:var(--r);padding:12px;color:var(--warn);margin-bottom:16px">
-            <strong>Opción:</strong> Cambia a "Recoger en el local" para procesar tu pedido.
+          <div style="background:var(--warn-bg);border:1px solid var(--warn);border-radius:var(--r);padding:14px;color:var(--warn);margin-bottom:20px">
+            <strong>✅ Opción:</strong> Cambia a "Recoger en el local" para poder procesar tu pedido.
           </div>
         </div>
         <div class="sheet-foot">
