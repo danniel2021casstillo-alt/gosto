@@ -1556,6 +1556,7 @@ function storeView(){
       </a>
       <div class="hdr-actions">
         ${Store.mode==='firestore' ? '<span class="livepill" title="Conectado a la nube">'+I.live+' En vivo</span>' : ''}
+        <button class="icon-btn" data-act="tracking" title="Seguir mi pedido" aria-label="Seguir mi pedido">${I.tracking}</button>
         <button class="icon-btn" data-act="admin" title="Panel de administrador" aria-label="Panel de administrador">${I.gear}</button>
         <button class="cart-btn" data-act="cart" aria-label="Ver mi pedido">${I.cart}<span class="lb">Pedido</span><span class="n" id="hdrN">${cartCount()}</span></button>
       </div>
@@ -2541,7 +2542,7 @@ document.addEventListener('keydown', e => {
 window.addEventListener('hashchange', () => {
   const toAdmin = location.hash === '#admin';
   const toTracking = location.hash === '#tracking';
-  if(toAdmin === isAdmin && !toTracking) return;
+  if(toAdmin === isAdmin && !toTracking && location.hash !== '#menu') return;
   isAdmin = toAdmin;
   adminOK = toAdmin ? (S.user ? true : sessionStorage.getItem('gosto_admin') === '1') : false;
   closeSheet(true); render(); scrollTop(0); startWatch();
