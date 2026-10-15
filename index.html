@@ -644,76 +644,79 @@ body::before{
 .toast.err{border-color:rgba(178,58,46,.6)}
 .toast.err .ti svg{stroke:#FF8A7A}
 
-/* ============ 15. ADMIN ============ */
+/* ============ 15. ADMIN - MEJORADO ============ */
 .adm{background:var(--cream-2);min-height:100vh}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px;margin-block:20px}
+.adm .hdr{background:linear-gradient(135deg,var(--vino-deep),var(--vino-soft));border-bottom:2px solid var(--oro);box-shadow:0 4px 20px rgba(20,2,6,.4)}
+.adm .brand b{color:var(--oro-light)}
+.adm .brand small{color:var(--oro-pale)}
+
+/* KPIs mejorados */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-block:20px}
 .kpi{
   position:relative;overflow:hidden;
-  background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
-  padding:15px 17px;box-shadow:var(--sh-1);
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:16px 18px;box-shadow:0 4px 12px rgba(20,2,6,.08);
   transition:transform .3s var(--ease),box-shadow .3s var(--ease);
   animation:fadeUp .5s var(--ease-out) both;animation-delay:calc(var(--i,0)*70ms);
 }
-.kpi:hover{transform:translateY(-3px);box-shadow:var(--sh-2)}
-.kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--oro)}
-.kpi.hero{background:linear-gradient(135deg,var(--vino-soft),var(--vino-deep));border-color:var(--vino-deep)}
+.kpi:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(20,2,6,.16),0 0 0 4px rgba(200,155,60,.2)}
+.kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--oro)}
+.kpi.hero{background:linear-gradient(135deg,var(--vino-soft),var(--vino-deep));border-color:var(--vino-deep);color:#fff}
 .kpi.hero::before{background:var(--oro-light)}
 .kpi.hero .lbl{color:#DCB9BD}
 .kpi.hero .val{color:var(--oro-light)}
 .kpi.ok::before{background:var(--ok)}
-.kpi .lbl{font-size:11.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;display:block}
-.kpi .val{font-family:'Fraunces',serif;font-size:1.62rem;font-weight:700;color:var(--vino-deep);line-height:1.1;letter-spacing:-.02em;display:block}
-.kpi .sub{font-size:11.5px;color:var(--muted-2);margin-top:3px;display:block}
+.kpi .lbl{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;display:block}
+.kpi .val{font-family:'Fraunces',serif;font-size:1.7rem;font-weight:800;color:var(--vino-deep);line-height:1.1;letter-spacing:-.02em;display:block}
+.kpi.hero .val{color:var(--oro-light)}
+.kpi .sub{font-size:11px;color:var(--muted-2);margin-top:4px;display:block}
 
-.acard{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh-1);margin-bottom:18px;overflow:hidden}
-.acard-h{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line-2);background:linear-gradient(180deg,#fff,var(--cream))}
-.acard-h h2{margin-right:auto;display:flex;align-items:center;gap:9px}
-.acard-h .cnt{font-family:'Inter',sans-serif;font-size:12px;font-weight:700;background:var(--vino);color:var(--oro-light);border-radius:var(--r-full);padding:2px 10px}
-.acard-b{padding:16px 18px}
+.acard{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:0 6px 20px rgba(20,2,6,.08);margin-bottom:20px;overflow:hidden}
+.acard-h{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:18px 22px;border-bottom:1px solid var(--line-2);background:linear-gradient(180deg,#fff,var(--cream))}
+.acard-h h2{margin-right:auto;display:flex;align-items:center;gap:10px;font-size:1.15rem}
+.acard-h .cnt{font-family:'Inter',sans-serif;font-size:11.5px;font-weight:800;background:var(--vino);color:var(--oro-light);border-radius:var(--r-full);padding:2px 12px}
+.acard-b{padding:16px 22px}
 .acard-b.flush{padding:0}
 
-/* order table (desktop) */
+/* Tabla de pedidos mejorada */
 .otable-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.otable{width:100%;border-collapse:collapse;font-size:13.5px}
+.otable{width:100%;border-collapse:collapse;font-size:13px}
 .otable th{
-  text-align:left;font-size:11px;font-weight:800;color:var(--vino);
-  text-transform:uppercase;letter-spacing:.07em;
+  text-align:left;font-size:10px;font-weight:800;color:var(--vino);
+  text-transform:uppercase;letter-spacing:.08em;
   padding:12px 14px;background:var(--cream);white-space:nowrap;
-  border-bottom:2px solid var(--oro);position:sticky;top:0;z-index:1;
+  border-bottom:3px solid var(--oro);position:sticky;top:0;z-index:1;
 }
 .otable td{padding:12px 14px;border-bottom:1px solid var(--line-2);vertical-align:top}
-.otable tbody tr{transition:background .18s}
-.otable tbody tr:hover{background:var(--cream)}
+.otable tbody tr{transition:all .2s var(--ease)}
+.otable tbody tr:hover{background:var(--cream-2);transform:scale(1.01)}
 .otable tbody tr:last-child td{border-bottom:0}
-.otable .folio{font-family:'Fraunces',serif;font-weight:700;color:var(--vino);font-size:1rem;white-space:nowrap}
+.otable .folio{font-family:'Fraunces',serif;font-weight:800;color:var(--vino);font-size:1rem;white-space:nowrap}
 .otable .mut{color:var(--muted);font-size:11.5px;line-height:1.4}
-.otable .mut a{color:var(--info);text-decoration:none;font-weight:600}
+.otable .mut a{color:var(--info);text-decoration:none;font-weight:700}
 .otable .mut a:hover{text-decoration:underline}
-.otable .items{display:flex;flex-direction:column;gap:3px;min-width:180px}
+.otable .items{display:flex;flex-direction:column;gap:3px;min-width:170px}
 .otable .items i{font-style:normal}
 .otable .items b{color:var(--vino-deep)}
-.otable .money{font-family:'Fraunces',serif;font-weight:700;color:var(--vino);white-space:nowrap;font-size:1rem}
-.otable .rowact{display:flex;gap:6px;justify-content:flex-end}
+.otable .money{font-family:'Fraunces',serif;font-weight:800;color:var(--vino);white-space:nowrap;font-size:1rem}
 
-/* order cards (mobile) */
-.ocards{display:none;flex-direction:column;gap:12px}
-.ocard{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:14px;box-shadow:var(--sh-1);animation:fadeUp .45s var(--ease-out) both;animation-delay:calc(var(--i,0)*55ms)}
-.ocard-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:11px;padding-bottom:11px;border-bottom:1px solid var(--line-2)}
+/* Tarjetas de pedido móvil mejoradas */
+.ocards{display:none;flex-direction:column;gap:14px;padding:16px}
+.ocard{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:0 4px 16px rgba(20,2,6,.08);overflow:hidden;animation:fadeUp .5s var(--ease-out) both;animation-delay:calc(var(--i,0)*55ms)}
+.ocard-top{display:flex;align-items:flex-start;gap:12px;padding:16px;border-bottom:1px solid var(--line-2)}
 .ocard-top .l{flex:1;min-width:0}
-.ocard-top .folio{font-family:'Fraunces',serif;font-weight:700;color:var(--vino);font-size:1.05rem}
-.ocard-top b{display:block;font-size:14.5px;color:var(--vino-deep);line-height:1.3}
+.ocard-top .folio{font-family:'Fraunces',serif;font-weight:800;color:var(--vino);font-size:1.1rem}
+.ocard-top b{display:block;font-size:15px;color:var(--vino-deep);line-height:1.3}
 .ocard-top .mut{color:var(--muted);font-size:12px}
-.ocard-top .mut a{color:var(--info);text-decoration:none;font-weight:600}
-.ocard dl{display:grid;grid-template-columns:auto 1fr;gap:7px 12px;margin:0 0 12px;font-size:13px}
-.ocard dt{color:var(--muted);font-weight:600;font-size:12px}
+.ocard dl{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:16px;font-size:13px}
+.ocard dt{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
 .ocard dd{margin:0;color:var(--ink);min-width:0;word-break:break-word}
-.ocard-foot{display:flex;align-items:center;gap:8px;padding-top:12px;border-top:1px solid var(--line-2)}
-.ocard-foot select{flex:1}
-.ocard-foot .money{margin-right:auto;font-family:'Fraunces',serif;font-weight:700;color:var(--vino);font-size:1.05rem}
+.ocard-foot{display:flex;align-items:center;gap:10px;padding:14px 16px;border-top:1px solid var(--line-2)}
+.ocard-foot .money{margin-right:auto;font-family:'Fraunces',serif;font-weight:800;color:var(--vino);font-size:1.05rem}
 
 select.status{
-  appearance:none;padding:8px 32px 8px 12px;border:1.5px solid var(--line);border-radius:var(--r-xs);
-  font:inherit;font-size:13px;font-weight:700;cursor:pointer;background:var(--paper);
+  appearance:none;padding:8px 32px 8px 10px;border:1.5px solid var(--line);border-radius:var(--r-sm);
+  font:inherit;font-size:12px;font-weight:800;cursor:pointer;background:var(--paper);
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A7268' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 10px center;background-size:15px;
   transition:border-color .2s,box-shadow .2s;
@@ -749,16 +752,16 @@ select.status[data-s="Cancelado"]{background-color:var(--bad-bg);color:var(--bad
   font-size:13px;font-weight:700;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);
   transition:all .2s var(--ease);
 }
-.mini-btn:hover{border-color:var(--oro);color:var(--vino);transform:translateY(-1px)}
+.mini-btn:hover{border-color:var(--oro);color:var(--vino);transform:translateY(-2px);box-shadow:var(--sh-1)}
 .mini-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
 .mini-btn.danger:hover{border-color:var(--bad);color:var(--bad);background:var(--bad-bg)}
-.mini-btn.icon{padding:8px;width:34px;height:34px;justify-content:center}
-.mini-btn.icon svg{width:15px;height:15px}
+.mini-btn.icon{padding:10px;width:40px;height:40px;justify-content:center}
+.mini-btn.icon svg{width:16px;height:16px}
 
-.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
-.hours-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--cream)}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.hours-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--cream)}
 .hours-row>label{grid-column:1/-1!important;margin:0!important;display:flex!important;align-items:center;gap:8px}
-.hours-row .inp{padding:9px 8px;font-size:13px}
+.hours-row .inp{padding:10px 12px;font-size:13px}
 .formgrid .full{grid-column:1/-1}
 .prev{
   width:100%;aspect-ratio:16/10;border-radius:var(--r-sm);overflow:hidden;
@@ -1580,7 +1583,6 @@ function storeView(){
       <div class="hdr-actions">
         ${Store.mode==='firestore' ? '<span class="livepill" title="Conectado a la nube">'+I.live+' En vivo</span>' : ''}
         <button class="icon-btn" data-act="tracking" title="Seguir mi pedido" aria-label="Seguir mi pedido">${I.tracking}</button>
-        <button class="icon-btn" data-act="admin" title="Panel de administrador" aria-label="Panel de administrador">${I.gear}</button>
         <button class="cart-btn" data-act="cart" aria-label="Ver mi pedido">${I.cart}<span class="lb">Pedido</span><span class="n" id="hdrN">${cartCount()}</span></button>
       </div>
     </div>
@@ -1916,12 +1918,29 @@ async function confirmOrder(){
   const lat = parseFloat($('#f_lat').value) || null;
   const lng = parseFloat($('#f_lng').value) || null;
 
-  /* validar perímetro de 1 km para domicilio */
+  /* validar perímetro de 2 km para domicilio */
   if(entrega === 'Domicilio'){
     if(!lat || !lng){ toast('Se requiere tu ubicación para pedidos a domicilio','err'); return; }
     const d = distKm(PUNTO_REF.lat, PUNTO_REF.lng, lat, lng);
     if(d > RADIO_MAX_KM){
-      toast(`Tu ubicación está a ${d.toFixed(1)} km. Supera el radio máximo de ${RADIO_MAX_KM} km para domicilio. Elige "Recoger en el local".`,'err');
+      /* Pop-up tipo POS UP: mensaje de distancia excedida */
+      showSheet(`${sheetHead('⚠️ Fuera de zona de entrega')}
+        <div style="text-align:center;padding:10px 0">
+          <div style="font-size:48px;margin-bottom:12px">📍</div>
+          <h3 style="color:var(--bad);margin-bottom:8px">No podemos llevar a domicilio</h3>
+          <p style="color:var(--muted);margin-bottom:16px">
+            Tu ubicación está a <b>${d.toFixed(1)} km</b> del punto de referencia.<br>
+            El radio máximo para domicilio es <b>${RADIO_MAX_KM} km</b>.
+          </p>
+          <div style="background:var(--warn-bg);border:1px solid var(--warn);border-radius:var(--r);padding:12px;color:var(--warn);margin-bottom:16px">
+            <strong>Opción:</strong> Cambia a "Recoger en el local" para procesar tu pedido.
+          </div>
+        </div>
+        <div class="sheet-foot">
+          <button class="btn ghost block" onclick="location.hash='#menu'">Cambiar a Recoger en el local</button>
+          <button class="btn gold block" data-act="close">Entendido</button>
+        </div>
+      `, { label:'Zona de entrega', center:true });
       return;
     }
   }
@@ -2174,7 +2193,7 @@ function adminView(){
       </div>
     </div>
 
-    <button class="btn ghost" data-act="logout" style="margin-bottom:40px">Cerrar sesión de administrador</button>
+    <button class="btn logout-admin block" data-act="logout" style="margin-bottom:40px">Cerrar sesión de administrador</button>
   </main>
   </div>`;
 }
