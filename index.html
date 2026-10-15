@@ -1291,6 +1291,7 @@ const Store = {
       }
       rec.id = oRef.id;
       /* escribir en colección pública de seguimiento para que el cliente consulte su estado */
+      let trackingOk = false;
       try{
         await this.fdb.collection('tracking').doc(String(rec.folio)).set({
           folio: rec.folio,
@@ -1300,7 +1301,11 @@ const Store = {
           name: rec.name,
           date: rec.date
         });
-      }catch(e){ console.warn('tracking:', e); }
+        trackingOk = true;
+      }catch(e){
+        console.warn('tracking write failed:', e);
+        toast('Pedido creado, pero el seguimiento no está disponible aún. Guarda tu folio: #' + rec.folio, 'err');
+      }
     } else {
       rec.id = uid();
       rec.folio = 1000 + Math.floor(Math.random()*9000);
@@ -1498,7 +1503,16 @@ async function buscarTracking(folio){
   try{
     const snap = await Store.fdb.collection('tracking').doc(String(folio)).get();
     if(snap.exists) return snap.data();
-    /* fallback: si no está en tracking, buscar en orders (solo si el cliente tiene acceso) */
+    /* fallback: intentar leer directamente de orders por folio (solo si las reglas lo permiten) */
+    try{
+      const q = await Store.fdb.collection('orders').where('folio', '==', parseInt(folio)).limit(1).get();
+      if(!q.empty){
+        const d = q.docs[0].data();
+        return { folio:d.folio, status:d.status, total:d.total, metodo:d.metodo, name:d.name, date:d.date };
+      }
+    }catch(e){
+      console.warn('orders fallback:', e);
+    }
     return null;
   }catch(e){
     console.warn('tracking read:', e);
