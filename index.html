@@ -940,7 +940,7 @@ Object.freeze(PAGO_DEF.nequi); Object.freeze(PAGO_DEF.llave); Object.freeze(PAGO
 /* ─────────── ÁREA DE COBERTURA (pedidos a domicilio) ───────────
    Punto de referencia: carrera 58 # 94A-29 (Bogotá).
    Reemplaza lat/lng por las coordenadas exactas de tu local si las tienes. */
-const PUNTO_REF = { lat: 4.7089, lng: -74.0592 };
+const PUNTO_REF = { lat: 4.68351, lng: -74.06522 };
 const RADIO_MAX_KM = 2;
 
 /* distancia en km entre dos puntos (fórmula de Haversine) */
@@ -1838,21 +1838,27 @@ function openForm(){
             btn.disabled = true;
             /* Mensaje centrado en mitad de pantalla, muy visible */
             closeSheet();
-            showSheet(`${sheetHead('⚠️ Fuera de zona de entrega')}
-              <div style="text-align:center;padding:20px 10px">
-                <div style="font-size:56px;margin-bottom:16px">📍</div>
-                <h2 style="color:var(--bad);margin-bottom:12px">No se puede entregar a domicilio</h2>
-                <p style="color:var(--muted);font-size:15px;margin-bottom:18px;line-height:1.6">
-                  Tu ubicación está a <b style="color:var(--vino-deep)">${d.toFixed(1)} km</b> del punto de referencia.<br>
-                  El radio máximo de entrega es <b style="color:var(--vino-deep)">${RADIO_MAX_KM} km</b> a la redonda.
-                </p>
-                <div style="background:var(--warn-bg);border:2px solid var(--warn);border-radius:var(--r);padding:16px;color:var(--warn);margin-bottom:22px">
-                  <strong style="font-size:14px">✅ Opción:</strong>
-                  <p style="font-size:13px;margin-top:6px;margin-left:6px">Cambia a "Recoger en el local" para poder procesar tu pedido.</p>
+            showSheet(`${sheetHead('⚠️ FUERA DE ZONA DE ENTREGA')}
+              <div style="text-align:center;padding:24px 16px">
+                <div style="font-size:64px;margin-bottom:20px">🚫</div>
+                <h2 style="color:var(--bad);margin-bottom:14px;font-size:1.4rem">No podemos llevar a domicilio</h2>
+                <div style="background:linear-gradient(135deg,var(--bad-bg),var(--warn-bg));border:2px solid var(--bad);border-radius:var(--r-lg);padding:18px;margin-bottom:24px">
+                  <p style="font-size:15px;margin-bottom:8px;color:var(--vino-deep);font-weight:700">
+                    📍 Tu ubicación: <b>${d.toFixed(1)} km</b> del punto de referencia
+                  </p>
+                  <p style="font-size:15px;margin-bottom:0;color:var(--vino-deep);font-weight:700">
+                    📏 Radio máximo: <b>${RADIO_MAX_KM} km</b> a la redonda
+                  </p>
+                </div>
+                <div style="background:var(--warn-bg);border:2px solid var(--warn);border-radius:var(--r-lg);padding:18px;color:var(--warn)">
+                  <strong style="font-size:14px">✅ Qué puedes hacer:</strong>
+                  <p style="font-size:14px;margin-top:8px;line-height:1.5">
+                    Cambia la entrega a <b>"Recoger en el local"</b> y ven a buscar tu pedido directamente.
+                  </p>
                 </div>
               </div>
-              <div class="sheet-foot">
-                <button class="btn ghost block" onclick="location.hash='#menu'">${I.back} Cambiar a Recoger en el local</button>
+              <div class="sheet-foot" style="gap:10px">
+                <button class="btn ghost block" onclick="location.hash='#menu'">${I.back} Recoger en el local</button>
                 <button class="btn gold block" data-act="close">${I.check} Entendido</button>
               </div>
             `, { label:'Zona de entrega', center:true });
