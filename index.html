@@ -324,6 +324,11 @@ button.eyebrow:focus-visible{outline:2.5px solid var(--oro-light);outline-offset
 }
 .qty button:hover:not(:disabled){background:var(--vino);color:var(--oro-light);transform:scale(1.12)}
 .qty button:active:not(:disabled){transform:scale(.88)}
+.cq{font-variant-numeric:tabular-nums}
+.crow.lack .cq{color:var(--bad)}
+.lackmark{color:var(--bad);font-weight:800}
+.hint.shortage{color:var(--bad);background:var(--bad-bg);border:1.5px solid rgba(178,58,46,.35);padding:11px 13px;border-radius:var(--r-sm);font-size:13px;line-height:1.6}
+.emp-short{margin:8px 2px 0;color:#FFB3A4;background:rgba(255,155,138,.1);border:1px solid rgba(255,155,138,.35);border-radius:10px;padding:8px 11px;font-size:12.5px;line-height:1.5}
 .qty button:disabled{opacity:.3;cursor:not-allowed}
 .qty button svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}
 .qty b{min-width:24px;text-align:center;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--vino-deep)}
@@ -766,6 +771,10 @@ select.status[data-s="Cancelado"]{background-color:var(--bad-bg);color:var(--bad
 .emp-item:hover .emp-add{background:#E8C873;color:#3A0D18;transform:rotate(90deg)}
 .emp-add svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
 .emp-badge{position:absolute;top:8px;right:8px;min-width:26px;height:26px;border-radius:999px;background:linear-gradient(135deg,#F0D98C,#C89B3C);color:#3A0D18;font-size:12.5px;font-weight:900;display:none;align-items:center;justify-content:center;padding:0 7px;box-shadow:0 3px 10px rgba(200,155,60,.4)}
+.emp-item:disabled{opacity:.42;cursor:not-allowed}
+.emp-item:disabled:hover{transform:none;border-color:rgba(232,200,115,.18)}
+.emp-item:disabled .emp-add{display:none}
+.emp-badge.off{background:linear-gradient(135deg,#7A1622,#4A0A18);color:#FFD9CE;border:1px solid rgba(255,155,138,.55);display:inline-flex;letter-spacing:.1em;font-size:10.5px;text-transform:uppercase}
 .emp-item[data-q]:not([data-q="0"]) .emp-badge{display:inline-flex}
 
 .emp-ticket{position:sticky;top:76px;border:1px solid rgba(232,200,115,.25);border-radius:20px;padding:18px 18px 16px;
@@ -789,6 +798,7 @@ select.status[data-s="Cancelado"]{background-color:var(--bad-bg);color:var(--bad
 .emp-line-info span{font-size:11px;color:rgba(246,233,208,.5);font-variant-numeric:tabular-nums}
 .emp-qty{display:flex;align-items:center;gap:9px}
 .emp-qty button{width:32px;height:32px;border-radius:9px;border:1px solid rgba(232,200,115,.25);background:rgba(232,200,115,.08);color:#E8C873;display:flex;align-items:center;justify-content:center;transition:.15s}
+.emp-qty button:disabled{opacity:.32;cursor:not-allowed}
 .emp-qty button:hover{background:rgba(232,200,115,.2);border-color:#E8C873}
 .emp-qty b{min-width:22px;text-align:center;font-size:16px;color:#FBEFD6;font-variant-numeric:tabular-nums}
 .emp-qty svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.3;stroke-linecap:round}
@@ -1867,6 +1877,21 @@ let availabilityTimer=null;
 const whatsappPedido = pedido => 'https://wa.me/'+WHATSAPP_NEGOCIO+'?text='+encodeURIComponent(`Hola, acabo de hacer el pedido #${pedido.folio}. Soy ${pedido.name}. Total: ${money(pedido.total)}. Te envío aquí el comprobante de pago.`);
 const cartCount = () => Object.values(cart).reduce((a,b)=>a+b, 0);
 const cartTotal = () => Object.entries(cart).reduce((s,[id,q]) => s + (prod(id)?.price||0)*q, 0);
+/* líneas del carrito que superan el stock disponible */
+const cartShortage = () => Object.entries(cart)
+  .map(([id,q]) => ({ id, q, p: prod(id), have: stockQty(id) }))
+  .filter(x => x.p && x.have < x.q);
+/* recorta el carrito al stock disponible (quita lo que no alcanza) */
+function cartCapToStock(){
+  let ajustados = 0;
+  for(const { id, have } of cartShortage()){
+    if(have <= 0) delete cart[id]; else cart[id] = have;
+    ajustados++;
+  }
+  saveCart();
+  renderGrid();
+  return ajustados;
+}
 const fmtDate = iso => { try { return new Date(iso).toLocaleString('es-CO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } };
 
 /* SHA-256 (solo para el PIN del modo local; en Firestore usa Firebase Auth) */
@@ -2084,13 +2109,15 @@ const Store = {
     }catch(e){ console.warn('No se pudieron leer los gastos:', e); S.gastos = S.gastos || []; }
   },
   async loadStock(){
-    if(this.mode !== 'firestore' || !adminOK) return;
-    try{
-      const s = await this.fdb.collection('stock').get();
-      const next = {};
-      s.docs.forEach(d => { next[d.id] = cleanStock(d.data()); });
-      S.stock = next;
-    }catch(e){ console.warn('No se pudo leer el inventario:', e); }
+    if(this.mode === 'firestore'){
+      try{
+        const s = await this.fdb.collection('stock').get();
+        const next = {};
+        s.docs.forEach(d => { next[d.id] = cleanStock(d.data()); });
+        S.stock = next;
+      }catch(e){ console.warn('No se pudo leer el inventario:', e); }
+    }
+    /* en modo local el inventario ya viene de localStorage */
   },
 
   /* pedidos en vivo */
@@ -2621,8 +2648,11 @@ const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${Stri
 const isTodayDate = d => { try { const s = String(d||''); const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/); if(m){ const n = new Date(); return n.getFullYear() === +m[1] && n.getMonth() === +m[2]-1 && n.getDate() === +m[3]; } return new Date(d).toDateString() === new Date().toDateString(); } catch(e){ return false; } };
 function eAddQty(id, delta){
   const p = prod(id); if(!p || !pActive(p)) return;
-  const q = Math.max(0, (Number(eCart[id])||0) + delta);
+  const max = stockQty(id);
+  const cur = Number(eCart[id])||0;
+  const q = Math.max(0, cur + delta);
   if(q > 99){ toast('Máximo 99 unidades por producto','err'); return; }
+  if(delta > 0 && q > max){ toast(max ? `Sin más unidades de «${p.name}» (quedan ${max})` : `«${p.name}» está agotado`, 'err'); return; }
   if(q > 0 && !eCart[id] && Object.keys(eCart).length >= 20){ toast('Máximo 20 productos por venta','err'); return; }
   if(q === 0) delete eCart[id]; else eCart[id] = q;
   refreshEmployee();
@@ -2640,7 +2670,7 @@ function empLinesHTML(){
       <div class="emp-qty">
         <button data-act="empdec" data-id="${esc(id)}" aria-label="Quitar uno de ${esc(p.name)}">${I.minus}</button>
         <b>${q}</b>
-        <button data-act="empinc" data-id="${esc(id)}" aria-label="Agregar uno de ${esc(p.name)}">${I.plus}</button>
+        <button data-act="empinc" data-id="${esc(id)}" aria-label="Agregar uno de ${esc(p.name)}" ${q >= stockQty(id) ? 'disabled' : ''}>${I.plus}</button>
       </div>
       <div class="emp-line-sub">${money(sub)}<button class="emp-rem" data-act="emprem" data-id="${esc(id)}" aria-label="Quitar ${esc(p.name)}">${I.x}</button></div>
     </div>`;
@@ -2650,10 +2680,21 @@ function refreshEmployee(){
   const lines = $('#empLines'); if(lines) lines.innerHTML = empLinesHTML();
   const t = $('#empTotal'); if(t) t.textContent = money(eCartTotal());
   const c = $('#empCount'); if(c) c.textContent = eCartCount();
+  const short = Object.entries(eCart).some(([id,q]) => q > stockQty(id));
+  const warn = $('#empShort'); if(warn){ warn.hidden = !short; }
   const clr = document.querySelector('[data-act="empclear"]'); if(clr) clr.disabled = !eCartCount();
   const btn = document.querySelector('[data-act="empregist"]');
-  if(btn){ btn.disabled = !eCartCount(); btn.innerHTML = I.check + ' Registrar venta'; }
-  $$('.emp-item').forEach(b => { b.dataset.q = eCart[b.dataset.id] || 0; const badge = b.querySelector('.emp-badge'); if(badge) badge.textContent = b.dataset.q; });
+  if(btn){ btn.disabled = !eCartCount() || short; btn.title = short ? 'Stock insuficiente para completar esta venta' : 'Registrar venta'; btn.innerHTML = I.check + ' Registrar venta'; }
+  $$('.emp-item').forEach(b => {
+    b.dataset.q = eCart[b.dataset.id] || 0;
+    const badge = b.querySelector('.emp-badge'); if(badge) badge.textContent = b.dataset.q;
+    /* si el stock llegó a 0, bloquear el botón y marcar agotado */
+    if(stockQty(b.dataset.id) <= 0){
+      b.classList.add('out'); b.disabled = true;
+      if(badge){ badge.textContent = 'Agotado'; badge.classList.add('off'); }
+      const price = b.querySelector('.emp-item-price'); if(price) price.textContent = 'Agotado';
+    }
+  });
 }
 function employeeView(){
   const N = negocio();
@@ -2683,17 +2724,21 @@ function employeeView(){
         </div>
       </div>
       <div class="emp-grid">
-        ${avail.length ? avail.map(p => `
-          <button class="emp-item" data-act="empadd" data-id="${esc(p.id)}" data-q="${eCart[p.id]||0}" aria-label="Agregar ${esc(p.name)}">
+        ${avail.length ? avail.map(p => {
+          const stock = stockQty(p.id);
+          const out = stock <= 0;
+          return `
+          <button class="emp-item ${out ? 'out' : ''}" data-act="empadd" data-id="${esc(p.id)}" data-q="${eCart[p.id]||0}" aria-label="${out ? `${esc(p.name)} agotado` : `Agregar ${esc(p.name)} · quedan ${stock}`}" ${out ? 'disabled' : ''}>
             <span class="emp-thumb"><span class="ph">${catEmoji(p.cat)}</span>
               <img src="${U(p.img,160,160)}" alt="" loading="lazy" onload="this.parentNode.classList.add('ok')" onerror="this.remove()" width="160" height="160"></span>
             <span class="emp-item-tx">
               <span class="emp-item-name">${esc(p.name)}</span>
-              <span class="emp-item-price">${money(p.price)}</span>
+              <span class="emp-item-price">${out ? 'Agotado' : money(p.price)}</span>
             </span>
             <span class="emp-add">${I.plus}</span>
-            <span class="emp-badge">${eCart[p.id]||0}</span>
-          </button>`).join('')
+            <span class="emp-badge ${out ? 'off' : ''}">${out ? 'Agotado' : (eCart[p.id]||0)}</span>
+          </button>`;
+        }).join('')
         : `<div class="empty" style="grid-column:1/-1"><span class="ico">🍽️</span><h3>No hay productos disponibles</h3><p>Marca productos como disponibles en el panel de administrador.</p></div>`}
       </div>
     </section>
@@ -2711,6 +2756,7 @@ function employeeView(){
         ${Object.entries(METODOS_PAGO).map(([k,v]) => `
           <button class="emp-method ${eMetodo===k?'on':''}" data-act="empmethod" data-method="${k}" aria-pressed="${eMetodo===k}"><span class="em">${v.ico}</span>${esc(v.label)}<small>${k==='efectivo'?'En caja':k==='nequi'?'Transferencia':'Llave Bre-B'}</small></button>`).join('')}
       </div>
+      <p class="emp-short" id="empShort" hidden>Sin stock suficiente para completar esta venta. Revisa las cantidades.</p>
       <button class="emp-submit" data-act="empregist" ${eCartCount()?'':'disabled'}>${I.check} Registrar venta</button>
       <button class="emp-clear" data-act="empclear" ${eCartCount()?'':'disabled'}>${I.trash} Borrar venta</button>
     </aside>
@@ -2721,6 +2767,11 @@ function employeeView(){
 async function registerEmployeeSale(){
   const entries = Object.entries(eCart);
   if(!entries.length){ toast('Agrega al menos un producto','err'); return; }
+  /* validar stock antes de cobrar */
+  const faltan = entries
+    .map(([id,q]) => ({ p: prod(id), q }))
+    .filter(x => x.p && stockQty(x.p.id) < x.q);
+  if(faltan.length){ toast('Sin stock suficiente de: ' + faltan.map(x => `${x.p.name} (quedan ${stockQty(x.p.id)})`).join(', '), 'err'); return; }
   const metodo = METODOS_PAGO[eMetodo] ? eMetodo : 'efectivo';
   const nameInput = $('#empName');
   const vendedor = (nameInput?.value.trim() || (() => { try { return localStorage.getItem('gosto_vendedor') || ''; } catch(e){ return ''; } })() || 'Venta mostrador').slice(0,40);
@@ -2765,25 +2816,27 @@ async function registerEmployeeSale(){
 function card(p, i){
   const q = cart[p.id] || 0;
   const id = esc(p.id);
+  const stock = stockQty(p.id);
+  const out = !p.available || stock <= 0;
   return `
-  <article class="card ${p.available?'':'sold'}" style="--i:${i}">
+  <article class="card ${out?'sold':''}" style="--i:${i}">
     <div class="thumb">
       <span class="ph">${catEmoji(p.cat)}</span>
       <img src="${U(p.img,600,450)}" srcset="${SRC(p.img,400,300)}, ${SRC(p.img,800,600)}"
            sizes="(max-width:640px) 45vw, (max-width:900px) 30vw, 260px" alt="${esc(p.name)}"
            loading="lazy" decoding="async" width="600" height="450"
            onload="this.parentNode.classList.add('ok')" onerror="this.remove()">
-      ${!p.available ? '<span class="badge sold">Agotado</span>' : (i<2 ? '<span class="badge hot">Top</span>' : '')}
+      ${out ? '<span class="badge sold">Agotado</span>' : (i<2 ? '<span class="badge hot">Top</span>' : '')}
     </div>
     <div class="card-body">
       <h3>${esc(p.name)}</h3>
       <p class="desc">${esc(p.desc || 'Sin descripción')}</p>
       <div class="card-foot">
         <span class="price">${money(p.price)}<small>COP</small></span>
-        ${p.available ? `<div class="qty" data-qty="${id}">
+        ${!out ? `<div class="qty" data-qty="${id}">
           <button data-act="dec" data-id="${id}" aria-label="Quitar uno de ${esc(p.name)}" ${q===0?'disabled':''}>${I.minus}</button>
           <b id="q-${id}">${q}</b>
-          <button data-act="inc" data-id="${id}" aria-label="Agregar ${esc(p.name)}">${I.plus}</button>
+          <button data-act="inc" data-id="${id}" aria-label="Agregar ${esc(p.name)}" ${q >= stock ? 'disabled' : ''}>${I.plus}</button>
         </div>` : '<span class="pill bad">Sin stock</span>'}
       </div>
     </div>
@@ -2808,8 +2861,11 @@ function syncCartBar(){
 function addQty(id, d){
   const p = prod(id);
   if(!p || !p.available) return;
+  if(d > 0 && stockQty(id) <= 0){ toast(`«${p.name}» está agotado`,'err'); return; }
   const MAX_ITEM = 99, MAX_CART = 20;   /* los mismos limites que las reglas de Firestore */
+  const max = stockQty(id);
   const q = Math.max(0, (cart[id]||0) + d);
+  if(d > 0 && q > max){ toast(max ? `Sin más unidades de «${p.name}» (quedan ${max})` : `«${p.name}» está agotado`, 'err'); return; }
   if(q > MAX_ITEM){ toast('Máximo ' + MAX_ITEM + ' unidades por producto','err'); return; }
   if(q > 0 && !cart[id] && Object.keys(cart).length >= MAX_CART){ toast('Máximo ' + MAX_CART + ' productos por pedido','err'); return; }
   if(q === 0) delete cart[id]; else cart[id] = q;
@@ -2821,6 +2877,8 @@ function addQty(id, d){
   if(wrap){
     const dec = wrap.querySelector('[data-act="dec"]');
     if(dec) dec.disabled = q === 0;
+    const inc = wrap.querySelector('[data-act="inc"]');
+    if(inc) inc.disabled = q >= stockQty(id);
     if(d > 0){ wrap.classList.remove('added'); void wrap.offsetWidth; wrap.classList.add('added'); }
   }
   const row = document.querySelector(`.crow[data-id="${selId(id)}"]`);
@@ -2860,19 +2918,22 @@ function openCart(){
     return;
   }
   const estado = disponibilidad();
+  const short = cartShortage();
   const rows = Object.entries(cart).map(([id,q],i) => {
     const p = prod(id); if(!p) return '';
+    const have = stockQty(id);
+    const falta = have < q;
     return `
-    <div class="crow" data-id="${esc(id)}" style="--i:${i}">
+    <div class="crow ${falta ? 'lack' : ''}" data-id="${esc(id)}" style="--i:${i}">
       <div class="th"><span class="ph">${catEmoji(p.cat)}</span>
         <img src="${U(p.img,160,160)}" alt="" loading="lazy" width="160" height="160"
              onload="this.parentNode.classList.add('ok')" onerror="this.remove()"></div>
-      <div class="info"><b>${esc(p.name)}</b><small>${money(p.price)} c/u</small></div>
+      <div class="info"><b>${esc(p.name)}</b><small>${money(p.price)} c/u${falta ? ` · <span class="lackmark">quedan ${have}</span>` : ''}</small></div>
       <div class="rt"><b class="ct">${money(p.price*q)}</b>
         <div class="qty">
           <button data-act="dec" data-id="${esc(id)}" aria-label="Quitar uno">${I.minus}</button>
           <b class="cq">${q}</b>
-          <button data-act="inc" data-id="${esc(id)}" aria-label="Agregar uno">${I.plus}</button>
+          <button data-act="inc" data-id="${esc(id)}" aria-label="Agregar uno" ${q >= have ? 'disabled' : ''}>${I.plus}</button>
         </div>
       </div>
       <button class="mini-x" data-act="delitem" data-id="${esc(id)}" aria-label="Quitar ${esc(p.name)}">${I.x}</button>
@@ -2880,16 +2941,26 @@ function openCart(){
   }).join('');
 
   showSheet(`${sheetHead('Tu pedido','Revisa antes de confirmar.')}
-    ${rows}
+    ${rows}${short.length ? `<p class="hint shortage" role="alert"><b>Sin stock suficiente para ${short.length === 1 ? 'un producto' : 'algunos productos'}:</b><br>${short.map(s => `· ${esc(s.p.name)} — pediste ${s.q}, quedan ${s.have}`).join('<br>')}<br>Reduce las cantidades o quítalos para poder continuar.</p>` : ''}
     <div class="total"><span>Total a pagar</span><b>${money(cartTotal())}</b></div>
     <div class="sheet-foot">
-      ${estado.abierto ? `<button class="btn gold block" data-act="checkout">${I.check} Confirmar pedido</button>` : `<p class="hint">${esc(estado.texto)}. Puedes revisar el menú y volver durante el horario de atención.</p>`}
+      ${estado.abierto ? `<button class="btn gold block" data-act="checkout" ${short.length ? 'disabled' : ''}>${I.check} Confirmar pedido</button>` : `<p class="hint">${esc(estado.texto)}. Puedes revisar el menú y volver durante el horario de atención.</p>`}
       <button class="btn ghost block" data-act="close">Seguir comprando</button>
     </div>`, { label:'Tu pedido', mode:'cart' });
 }
 
 function openForm(){
   if(!disponibilidad().abierto){ toast('En este momento estamos cerrados','err'); openCart(); return; }
+  const short = cartShortage();
+  if(short.length){
+    showSheet(`${sheetHead('Falta stock','No se puede enviar el pedido así.')}
+      <div class="hint shortage" role="alert"><b>Retira o reduce estos productos:</b><br>${short.map(s => `· ${esc(s.p.name)} — pediste ${s.q}, quedan ${s.have}`).join('<br>')}</div>
+      <div class="sheet-foot">
+        <button class="btn gold block" data-act="cartcap">${I.check} Ajustar pedido al stock</button>
+        <button class="btn ghost block" data-act="cart">Volver al carrito</button>
+      </div>`, { label:'Sin stock', center:true });
+    return;
+  }
   const P = pago();
   showSheet(`${sheetHead('Datos del pedido','Solo necesitamos esto para llegar.')}
     <form id="of" novalidate>
@@ -2934,6 +3005,14 @@ async function confirmOrder(){
     return { id, name:String(p.name||'Producto'), price:Math.max(0, Math.round(Number(p.price)||0)), qty:q };
   });
 
+  /* validar stock antes de cobrar */
+  const faltan = items.filter(i => stockQty(i.id) < i.qty);
+  if(faltan.length){
+    toast('No hay stock suficiente de: ' + faltan.map(i => `${i.name} (quedan ${stockQty(i.id)})`).join(', '), 'err');
+    if(btn){ btn.disabled = false; btn.textContent = 'Enviar pedido'; }
+    return;
+  }
+
   if(btn){ btn.disabled = true; btn.innerHTML = `<span class="spin"></span> Enviando…`; }
   let pedido;
   try{
@@ -2958,6 +3037,7 @@ async function confirmOrder(){
   }
 
   await adjustStockForOrder(items, -1);
+  if(!isAdmin) renderGrid();   /* refresca badges "Agotado" tras la compra */
 
   cart = {}; saveCart();
   $$('.qty[data-qty]').forEach(w => {
@@ -4871,6 +4951,13 @@ document.addEventListener('click', async e => {
     case 'empregist': await registerEmployeeSale(); break;
     case 'cart': openCart(); break;
     case 'checkout': openForm(); break;
+    case 'cartcap': {
+      const n = cartCapToStock();
+      closeSheet();
+      if(n) toast(`${n} línea${n === 1 ? '' : 's'} ajustada${n === 1 ? '' : 's'} al stock disponible`);
+      openCart();
+      break;
+    }
     case 'close': closeSheet(); recipeDraft = null; break;
     case 'clrsearch': searchQ = ''; render(); break;
     case 'copy': {
@@ -5093,7 +5180,8 @@ function startWatch(){
   await Store.loadOrders();
   adminOK = Store.mode === 'firestore' ? !!S.user : sessionStorage.getItem('gosto_admin') === '1';
   adminTab = adminTabFromHash();
-  if(Store.mode !== 'firestore' || adminOK){ await Store.loadMaterials(); await Store.loadStock(); }
+  if(Store.mode !== 'firestore' || adminOK){ await Store.loadMaterials(); }
+  await Store.loadStock();   /* datos públicos: stock disponible para la tienda */
   render();
   startWatch();
 })();
