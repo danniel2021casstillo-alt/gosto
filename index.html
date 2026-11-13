@@ -1654,7 +1654,13 @@ const UNSPLASH = {
     'Otros':'photo-1615485290836-4ebcebf44aaf' },
   EMOJI:{ 'Burros':'🌯','Hamburguesas':'🍔','Papas':'🍟','Bebidas':'🥤','Otros':'🍽️' },
 };
-const U  = (id,w,h,q) => id ? `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&h=${h}&q=${q||70}` : '';
+const U  = (id,w,h,q) => {
+  if(!id) return '';
+  const v = String(id).trim();
+  /* enlaces directos: i.ibb.co, imgur, unsplash.com y cualquier otro https */
+  if(/^https?:\/\//i.test(v)) return v;
+  return `https://images.unsplash.com/${v}?auto=format&fit=crop&w=${w}&h=${h}&q=${q||70}`;
+};
 const SRC= (id,w,h) => `${U(id,w,h)} ${w}w, ${U(id,w*2,h*2)} ${w*2}w`;
 const catImg = c => UNSPLASH.CAT[c] || UNSPLASH.CAT.Otros;
 const catEmoji = c => UNSPLASH.EMOJI[c] || '🍽️';
@@ -3969,7 +3975,7 @@ function panelProductos(){
         <div class="field"><label for="pcat">Categoría</label><input class="inp" id="pcat" placeholder="Burros" list="catlist">
           <datalist id="catlist">${[...new Set(S.products.map(p=>pCat(p)))].map(c=>`<option value="${esc(c)}">`).join('')}</datalist></div>
         <div class="field"><label for="pprice">Precio de venta (COP)</label><input class="inp" id="pprice" type="number" inputmode="numeric" placeholder="18000" min="0"></div>
-        <div class="field"><label for="purl">Foto (URL de Unsplash, opcional)</label><input class="inp" id="purl" type="url" placeholder="photo-xxxxx o https://…"></div>
+        <div class="field"><label for="purl">Foto (URL de la foto, opcional)</label><input class="inp" id="purl" type="url" placeholder="photo-xxxxx o https://i.ibb.co/…"></div>
         <div class="field full"><label for="pdesc">Descripción</label><input class="inp" id="pdesc" placeholder="Con queso, lechuga y salsa de la casa"></div>
         <div class="field full"><p class="hint">El costo, la ganancia y el margen se calculan con la receta. Al continuar elegirás al menos un ingrediente de tu materia prima.</p></div>
         <div class="field full" style="margin-top:6px"><button class="btn sm" data-act="addprod">${I.plus} Agregar producto y receta</button></div>
@@ -4469,9 +4475,9 @@ function openEdit(id){
       <div class="field"><label for="e_cost">Costo (COP)</label><input class="inp" id="e_cost" type="number" inputmode="numeric" min="0" value="${costoVal}" ${hasRecipe?'disabled':''}>
         <small class="hint">${hasRecipe ? 'Automático por receta' : 'Manual (sin receta)'}</small></div>
       <div class="field full"><label for="e_desc">Descripción</label><input class="inp" id="e_desc" value="${esc(pDesc(p)||'')}"></div>
-      <div class="field full"><label for="e_img">Foto (URL de Unsplash)</label>
-        <input class="inp" id="e_img" value="${esc(p.img||'')}" placeholder="photo-1731090389603-d63060ee08a6">
-        <div class="hint">Pega el enlace de una foto de <b>unsplash.com</b>. Vacío = foto de la categoría.</div>
+      <div class="field full"><label for="e_img">Foto (URL de la foto, opcional)</label>
+        <input class="inp" id="e_img" value="${esc(p.img||'')}" placeholder="photo-… o https://i.ibb.co/…">
+        <div class="hint">Pega el enlace directo de una foto, p. ej. de <b>i.ibb.co</b> (sube la foto en <b>i.ibb.co</b> y copia el enlace) o de <b>unsplash.com</b>. Vacío = foto de la categoría.</div>
         <div class="prev" id="e_prev"><span class="ph">${catEmoji(cat)}</span>
           <img id="e_previ" src="${U(p.img,480,300)}" alt="" onload="this.parentNode.classList.add('ok')" onerror="this.remove()"></div></div>
       <div class="field full"><div class="recipe-summary" id="editSummary">
