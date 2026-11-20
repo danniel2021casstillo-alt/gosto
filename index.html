@@ -11,7 +11,7 @@
 
 /* ============ 1. TOKENS ============ */
 :root{
-  --vino:#4A0A18; --vino-deep:#2B050D; --vino-soft:#681327; --vino-ink:#250D0C;
+  --vino:#4A0A18; --vino-deep:#2B050D; --vino-soft:#681327;
   --oro:#C89B3C; --oro-light:#E8C873; --oro-pale:#F3E3C0;
   --cream:#FBF5EC; --cream-2:#F5EADC; --paper:#FFFFFF;
   --ink:#2B1210; --muted:#8A7268; --muted-2:#A99489; --line:#EBDFCE; --line-2:#F0E7DA;
@@ -56,7 +56,6 @@ h2{font-size:clamp(1.15rem,2.4vw,1.4rem)}
 h3{font-size:1.02rem}
 a{color:inherit}
 :focus-visible{outline:2.5px solid var(--oro);outline-offset:2px;border-radius:6px}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* scrollbar */
 *::-webkit-scrollbar{height:8px;width:8px}
@@ -70,11 +69,8 @@ a{color:inherit}
 @keyframes pop{0%{transform:scale(1)}38%{transform:scale(1.42)}100%{transform:scale(1)}}
 @keyframes popSoft{0%{transform:scale(1)}45%{transform:scale(1.12)}100%{transform:scale(1)}}
 @keyframes shimmer{100%{transform:translateX(100%)}}
-@keyframes sheetUp{from{opacity:0;transform:translate3d(0,100%,0)}to{opacity:1;transform:none}}
-@keyframes sheetIn{from{opacity:0;transform:scale(.92) translate3d(0,12px,0)}to{opacity:1;transform:none}}
 @keyframes kenburns{from{transform:scale(1.04) translate3d(0,0,0)}to{transform:scale(1.16) translate3d(0,-2%,0)}}
 @keyframes toastIn{from{opacity:0;transform:translate3d(0,20px,0) scale(.96)}to{opacity:1;transform:none}}
-@keyframes barUp{from{opacity:0;transform:translate3d(0,110%,0)}to{opacity:1;transform:none}}
 @keyframes ring{0%{box-shadow:0 0 0 0 rgba(178,58,46,.5)}100%{box-shadow:0 0 0 16px rgba(178,58,46,0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes cozyGlow{
@@ -86,7 +82,6 @@ a{color:inherit}
 /* ============ 4. LAYOUT ============ */
 .wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:clamp(14px,4vw,28px)}
 .section{margin-block:clamp(26px,5vw,44px)}
-.stack{display:flex;flex-direction:column}
 
 /* ============ 5. HEADER ============ */
 .hdr{
@@ -493,18 +488,6 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 .paybox .hd{display:flex;align-items:center;gap:9px;font-weight:700;color:var(--vino);font-size:14px}
 .paybox .hd b{font-family:'Fraunces',serif;font-size:1.05rem}
 .paybox p{margin:12px 0 4px;font-size:13.5px;color:var(--muted)}
-.paybox .num{
-  font-family:'Fraunces',serif;font-size:1.55rem;font-weight:700;color:var(--vino-deep);
-  letter-spacing:.01em;word-break:break-all;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-}
-.copybtn{
-  display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
-  background:var(--paper);border:1.5px solid var(--line);border-radius:var(--r-full);padding:5px 12px;
-  color:var(--vino);transition:all .2s;
-}
-.copybtn:hover{border-color:var(--oro);background:var(--oro-pale)}
-.copybtn.done{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
-.copybtn svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .paybox .own{color:var(--muted);font-size:12.5px;margin-top:8px}
 .confirm .btn{animation:fadeUp .5s .7s var(--ease-out) both}
 
@@ -554,23 +537,6 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 
 /* admin dashboard panels */
 .atpanel{animation:fadeUp .4s var(--ease-out) both;padding-bottom:8px}
-.qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
-.qbtn{
-  display:flex;flex-direction:column;align-items:flex-start;gap:5px;text-align:left;
-  padding:16px;border:1.5px solid var(--line);border-radius:var(--r);
-  background:linear-gradient(160deg,#fff,var(--cream));color:var(--vino-deep);
-  transition:transform .22s var(--spring),border-color .22s,box-shadow .22s;
-}
-.qbtn:hover{transform:translateY(-3px);border-color:var(--oro);box-shadow:var(--sh-2)}
-.qbtn svg{width:22px;height:22px;fill:none;stroke:var(--vino);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.qbtn b{font-size:14.5px}
-.qbtn span{color:var(--muted);font-size:12px;line-height:1.4}
-.statusline{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
-.statusline .st{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--r-full);font-size:13px;font-weight:800}
-.statusline .st.ok{background:var(--ok-bg);color:var(--ok)}
-.statusline .st.bad{background:var(--bad-bg);color:var(--bad)}
-.statusline .st.warn{background:var(--warn-bg);color:var(--warn)}
-.statusline p{color:var(--muted);font-size:13px;margin:0}
 .rlist{display:flex;flex-direction:column}
 .rrow{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line-2);flex-wrap:wrap}
 .rrow:last-child{border-bottom:0}
@@ -611,14 +577,10 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 .pl-break{display:flex;flex-direction:column;gap:9px;margin-top:14px}
 .pl-break>div{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 12px;border:1px dashed var(--line);border-radius:var(--r-xs);background:var(--cream);font-size:13px;color:var(--muted)}
 .pl-break>div b{font-variant-numeric:tabular-nums;color:var(--vino-deep)}
-.pl-break-total{background:var(--cream-2)!important;border-style:solid!important;color:var(--ink)!important}
-.pl-break-total b{color:var(--vino-deep)!important;font-size:15px}
 .pl-break-net{border:1.5px solid var(--oro)!important;background:linear-gradient(135deg,#FBF3DC,#F3E3C0)!important;color:var(--vino-deep)!important;font-weight:700}
 .pl-break-net b{color:var(--vino-deep)!important;font-size:17px;font-family:'Fraunces',Georgia,serif}
 .adm-dash .pl-break>div{border-color:rgba(242,214,143,.22);background:rgba(208,162,71,.07);color:rgba(246,233,208,.65)}
 .adm-dash .pl-break>div b{color:var(--ad-cream)}
-.adm-dash .pl-break-total{background:rgba(208,162,71,.12)!important;color:var(--ad-cream)!important}
-.adm-dash .pl-break-total b{color:var(--ad-cream)!important}
 .adm-dash .pl-break-net{background:linear-gradient(135deg,#3A2A10,#241505)!important;border-color:rgba(232,200,115,.5)!important;color:#F0D98C!important}
 .adm-dash .pl-break-net b{color:#F0D98C!important}
 
@@ -995,13 +957,12 @@ select.status[data-s="Cancelado"]{background-color:var(--bad-bg);color:var(--bad
 
 /* ============ 18. DASHBOARD ADMIN (rediseño) ============ */
 .adm-dash{
-  --ad-bg:#22050B; --ad-bg-2:#2D070F;
-  --ad-side:#140A0B; --ad-side-deep:#0C0607;
+  --ad-bg:#22050B;
+  --ad-side:#140A0B;
   --ad-panel:#1A0F11; --ad-panel-2:#12090B;
   --ad-cream:#F6E9D0; --ad-muted:rgba(246,233,208,.66);
   --ad-gold:#D0A247; --ad-gold-2:#F2D68F; --ad-ink:#1B0E10;
   --ad-line:rgba(242,214,143,.18);
-  --ad-glow:rgba(242,214,143,.22);
   background:var(--ad-bg); color:var(--ad-cream); min-height:100vh;
 }
 .adm-dash .adm-side{
@@ -1319,41 +1280,6 @@ select.status[data-s="Cancelado"]{background-color:var(--bad-bg);color:var(--bad
 .adm-dash .gasto-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--ad-gold),var(--ad-gold-2));box-shadow:0 0 10px rgba(242,214,143,.5)}
 .adm-dash .gasto-val{font-family:'Fraunces',serif;font-weight:700;color:var(--ad-cream);white-space:nowrap;text-shadow:0 0 16px rgba(242,214,143,.22)}
 
-/* vender */
-.adm-dash .sell-hero{
-  position:relative;isolation:isolate;overflow:hidden;
-  display:flex;align-items:center;gap:24px;justify-content:space-between;
-  padding:clamp(22px,3vw,34px);margin-bottom:18px;border-radius:20px;
-  background:
-    radial-gradient(520px 260px at 82% -30%,rgba(255,240,200,.26),transparent 64%),
-    linear-gradient(112deg,rgba(255,236,190,.12) 0%,transparent 44%),
-    linear-gradient(118deg,#5C3B12 0%,#96682A 55%,#4C2F10 100%);
-  color:var(--ad-cream);border:1px solid rgba(242,214,143,.28);
-  box-shadow:0 22px 48px rgba(0,0,0,.4),0 0 46px rgba(208,162,71,.14),inset 0 1px 0 rgba(255,245,214,.18);
-}
-.adm-dash .sell-hero::after{
-  content:'';position:absolute;z-index:-1;width:340px;height:340px;right:-80px;top:-170px;border-radius:50%;pointer-events:none;
-  background:radial-gradient(circle,rgba(255,240,200,.28),transparent 68%);
-}
-.adm-dash .sell-copy{flex:1;min-width:0}
-.adm-dash .sell-kicker{font-size:9.5px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:rgba(243,229,201,.7)}
-.adm-dash .sell-copy h2{font-size:clamp(1.25rem,2.2vw,1.7rem);color:var(--ad-cream);margin-top:5px}
-.adm-dash .sell-copy p{font-size:13px;line-height:1.55;color:rgba(243,229,201,.82);max-width:56ch;margin-top:6px}
-.adm-dash .sell-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
-.adm-dash .sell-hero .btn.ghost{background:rgba(0,0,0,.24);color:var(--ad-cream);border-color:rgba(242,214,143,.38);box-shadow:inset 0 1px 0 rgba(255,245,214,.1)}
-.adm-dash .sell-hero .btn.ghost:hover{background:rgba(0,0,0,.34);border-color:rgba(242,214,143,.6);box-shadow:0 0 20px rgba(242,214,143,.16)}
-.adm-dash .sell-mini{
-  flex:none;min-width:170px;padding:18px 20px;border-radius:16px;text-align:center;
-  background:
-    radial-gradient(circle at 70% 10%,rgba(255,240,200,.18),transparent 62%),
-    rgba(0,0,0,.24);
-  border:1.5px solid rgba(242,214,143,.34);
-  box-shadow:inset 0 1px 0 rgba(255,245,214,.14),0 0 24px rgba(242,214,143,.1);
-}
-.adm-dash .sell-mini span{display:block;font-size:9.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,229,201,.7);}
-.adm-dash .sell-mini b{display:block;font-family:'Fraunces',serif;font-size:1.45rem;color:var(--ad-cream);line-height:1.15;margin-top:5px}
-.adm-dash .sell-mini small{display:block;font-size:11px;font-weight:700;color:rgba(243,229,201,.7);margin-top:3px}
-
 /* listas internas */
 .adm-dash .rrow{border-bottom-color:rgba(242,214,143,.1)}
 .adm-dash .rrow .folio,.adm-dash .rrow .money{color:var(--ad-cream)}
@@ -1364,10 +1290,6 @@ select.status[data-s="Cancelado"]{background-color:var(--bad-bg);color:var(--bad
 .adm-dash .pill.warn{background:rgba(242,214,143,.12);border:1px solid rgba(242,214,143,.32);color:var(--ad-cream)}
 .adm-dash .pill.info{background:linear-gradient(135deg,rgba(208,162,71,.4),rgba(242,214,143,.24));color:var(--ad-cream);border:1px solid rgba(242,214,143,.38);box-shadow:0 0 16px rgba(242,214,143,.12)}
 .adm-dash .pill.bad{background:rgba(112,22,30,.55);color:#F0D2CB;border:1px solid rgba(240,210,203,.16)}
-.adm-dash .statusline .st.ok{background:rgba(208,162,71,.22);color:var(--ad-gold-2);box-shadow:0 0 16px rgba(242,214,143,.12)}
-.adm-dash .statusline .st.warn{background:rgba(242,214,143,.12);border:1px solid rgba(242,214,143,.32);color:var(--ad-cream)}
-.adm-dash .statusline .st.bad{background:rgba(112,22,30,.55);color:#F0D2CB}
-.adm-dash .statusline p{color:rgba(246,233,208,.7)}
 
 /* formularios, tablas y controles dentro del panel */
 .adm-dash .field>label{color:var(--ad-cream)}
@@ -1532,9 +1454,6 @@ select.status[data-s="Cancelado"]{background-color:var(--bad-bg);color:var(--bad
   .adm-dash .bars{height:190px;gap:7px;padding-inline:2px}
   .adm-dash .bar-col{max-width:64px}
   .adm-dash .bar-label{font-size:9.5px}
-  .adm-dash .sell-hero{flex-direction:column;align-items:stretch;padding:20px 18px;border-radius:18px}
-  .adm-dash .sell-mini{min-width:0;width:100%}
-  .adm-dash .sell-actions .btn{flex:1}
   .adm-dash .emp-row,.adm-dash .gasto-row{padding:10px 0}
   .adm-dash .emp-av{width:38px;height:38px}
   .adm-dash .emp-amt,.adm-dash .gasto-val{font-size:.92rem}
@@ -1593,11 +1512,6 @@ const firebaseConfig = {
   messagingSenderId: '428604748357',
   appId:             '1:428604748357:web:a04323ace2c7e622fd692c',
 };
-/* Correo del administrador. Debe coincidir EXACTAMENTE con el que
-   pongas en las reglas de Firestore. No es una contraseña: el login
-   real lo hace Firebase Auth con correo + contraseña. */
-const ADMIN_EMAIL = 'danniel2021casstillo@gmail.com';
-
 /* Datos por defecto (se copian a Firestore la primera vez) */
 const NEGOCIO_DEF = { nombre:'Gosto', claims:'Entrega en 30 min', claimPago:'Paga al recibir', wa:'573215044698' };
 const WHATSAPP_NEGOCIO = '573215044698';
@@ -1669,15 +1583,6 @@ const catEmoji = c => UNSPLASH.EMOJI[c] || '🍽️';
 const KCAR = 'gosto_carrito_v1';
 const KLOCAL = 'gosto_tienda_v1';
 
-const seed = () => [
-  { name:'Burro de carne',      desc:'Con queso, lechuga y salsa de la casa', price:18000, cat:'Burros',       available:true,  img:'photo-1731090389603-d63060ee08a6' },
-  { name:'Burro de pollo',      desc:'Pollo desmechado, arroz y frijol',      price:16000, cat:'Burros',       available:true,  img:'photo-1707528903761-f63b970bd612' },
-  { name:'Hamburguesa clásica', desc:'Carne, queso, tocineta',                 price:17000, cat:'Hamburguesas', available:true,  img:'photo-1568901346375-23c9450c58cd' },
-  { name:'Hamburguesa doble',   desc:'Doble carne, doble queso',               price:22000, cat:'Hamburguesas', available:false, img:'photo-1586190848861-99aa4a171e90' },
-  { name:'Papas con queso',     desc:'Porción grande',                         price:9000,  cat:'Otros',        available:true,  img:'photo-1606755456206-b25206cde27e' },
-  { name:'Gaseosa 400ml',       desc:'Con mucho hielo',                        price:4000,  cat:'Otros',        available:true,  img:'photo-1574706226623-e5cc0da928c6' },
-];
-
 const S = { products:[], orders:[], cfg:null, user:null, ready:false, unsub:null, unsubGastos:null, initError:'', ordersError:'', materials:[], stock:{}, compras:[], gastos:[] };
 let cart = {};
 try { cart = JSON.parse(localStorage.getItem(KCAR) || '{}') || {}; } catch(e){ cart = {}; }
@@ -1736,8 +1641,6 @@ function normImg(v){
   return '';
 }
 const prod  = id => S.products.find(p => p.id === id);
-const materialName = m => matNombre(m);
-const materialUnit = m => matUnidad(m);
 
 /* ─────────── INVENTARIO / MATERIA PRIMA ─────────── */
 const LOW_STOCK = 5;
@@ -2022,7 +1925,6 @@ const Store = {
     }
     const batch=this.fdb.batch();
     batch.set(cfgRef,{negocio:NEGOCIO_DEF,horario:HORARIO_DEF});
-    seed().forEach((p,i)=>batch.set(this.fdb.collection('products').doc('p'+(i+1)),{...clean(p),ts:i}));
     await batch.commit();
   },
 
@@ -2034,8 +1936,7 @@ const Store = {
       ? raw.materials.map((m,i) => ({ id:m.id||('m'+(i+1)), ...cleanMaterial(m), ts:Number(m.ts)||0 })) : [];
     S.compras = Array.isArray(raw?.compras) ? raw.compras.map((c,i) => ({ id:c.id||('c'+(i+1)), ...cleanCompra(c), ts:Number(c.ts)||0 })) : [];
     S.gastos  = Array.isArray(raw?.gastos)  ? raw.gastos.map((g,i)  => ({ id:g.id||('g'+(i+1)),  ...cleanGasto(g),  ts:Number(g.ts)||0 }))  : [];
-    S.products = Array.isArray(raw?.products) ? raw.products.map((p,i) => ({ id:p.id||('p'+(i+1)), ...clean(p), ts:Number(p.ts)||i }))
-      : seed().map((p,i) => ({ id:'p'+(i+1), ...clean(p), ts:i }));
+    S.products = Array.isArray(raw?.products) ? raw.products.map((p,i) => ({ id:p.id||('p'+(i+1)), ...clean(p), ts:Number(p.ts)||i })) : [];
     S.orders  = Array.isArray(raw?.pedidos) ? raw.pedidos : [];
     S.cfg     = raw?.cfg || { negocio:NEGOCIO_DEF, pago:PAGO_DEF };
     S.stock = {};
@@ -2056,11 +1957,6 @@ const Store = {
       try{ s = await this.fdb.collection('products').orderBy('ts').get(); }
       catch(e){ s = await this.fdb.collection('products').get(); }
       S.products = s.docs.map(d => ({ id:d.id, ...clean(d.data()) }));
-      /* Si la nube está vacía (el admin aún no ha entrado para sembrar
-         el catálogo), mostramos el menú de ejemplo en vez de una tienda
-         en blanco. No se escribe nada: eso lo hace maybeSeed() al
-         iniciar sesión. */
-      if(!S.products.length) S.products = seed().map((p,i) => ({ id:'p'+(i+1), ...clean(p), ts:i }));
     }
   },
   async loadConfig(){
@@ -4478,10 +4374,10 @@ function openEdit(id){
       <div class="field full"><label for="e_img">Foto (URL de la foto, opcional)</label>
         <input class="inp" id="e_img" value="${esc(p.img||'')}" placeholder="photo-… o https://i.ibb.co/…">
         <div class="hint">Pega el enlace directo de una foto, p. ej. de <b>i.ibb.co</b> (sube la foto en <b>i.ibb.co</b> y copia el enlace) o de <b>unsplash.com</b>. Vacío = foto de la categoría.</div>
-        <div class="prev" id="e_prev"><span class="ph">${catEmoji(cat)}</span>
-          <img id="e_previ" src="${U(p.img,480,300)}" alt="" onload="this.parentNode.classList.add('ok')" onerror="this.remove()"></div></div>
-      <div class="field full"><div class="recipe-summary" id="editSummary">
-        <span>Costo: <b id="esCost">${money(pr.cost)}</b>${hasRecipe?'':' (manual)'}</span>
+        <div class="prev"><span class="ph">${catEmoji(cat)}</span>
+          <img src="${U(p.img,480,300)}" alt="" onload="this.parentNode.classList.add('ok')" onerror="this.remove()"></div></div>
+      <div class="field full"><div class="recipe-summary">
+        <span>Costo: <b>${money(pr.cost)}</b>${hasRecipe?'':' (manual)'}</span>
         <span>Precio: <b id="esPrice">${money(precio)}</b></span>
         <span>Ganancia: <b id="esProfit">${money(pr.profit)}</b></span>
         <span>Margen: <b id="esMargin">${Math.round(pr.margin)}%</b></span>
@@ -4570,11 +4466,6 @@ async function saveStockQty(id, val){
   try{ await Store.saveStock(id, { qty:val }); paintStockRow(id); }
   catch(e){ toast('No se pudo guardar el inventario: ' + (e.message||e), 'err'); }
 }
-function refreshProfits(){
-  const pb = $('#profitBox'); if(pb) pb.innerHTML = profitRowsHTML();
-  refreshDash();
-  updateTabCounts();
-}
 function refreshMateria(){
   const box = $('#matBox'); if(box) box.innerHTML = matRowsHTML();
   const cbox = $('#comprasBox'); if(cbox) cbox.innerHTML = comprasRowsHTML();
@@ -4646,7 +4537,6 @@ async function saveMat(){
     toast('Materia prima actualizada');
   }catch(e){ toast('No se pudo guardar: ' + (e.message||e),'err'); }
 }
-async function saveMatPrice(id, val){ /* no-op: precio unitario se calcula por compras */ }
 function updateCompraHint(){
   const id = $('#cmat')?.value;
   const m = id ? mat(id) : null;
@@ -5112,16 +5002,6 @@ document.addEventListener('input', e => {
     e.target._t = setTimeout(() => e.target.classList.remove('edited'), 900);
     clearTimeout(e.target._p);
     e.target._p = setTimeout(() => saveStockQty(id, val), 600);
-  }
-  if(e.target.dataset?.act === 'matprice'){
-    const id = e.target.dataset.id;
-    const val = Math.max(0, parseInt(e.target.value,10)||0);
-    e.target.value = val;
-    e.target.classList.add('edited');
-    clearTimeout(e.target._t);
-    e.target._t = setTimeout(() => e.target.classList.remove('edited'), 900);
-    clearTimeout(e.target._p);
-    e.target._p = setTimeout(() => saveMatPrice(id, val), 600);
   }
   if(e.target.dataset?.act === 'recipeqty') updateRecipeSummary();
   if(e.target.id === 'e_price' || e.target.id === 'e_cost') updateEditSummary();
