@@ -187,6 +187,54 @@ button.eyebrow:focus-visible{outline:2.5px solid var(--oro-light);outline-offset
 .hero-facts div{display:flex;align-items:center;gap:8px;color:#EBD7D1;font-size:13px;font-weight:500}
 .hero-facts b{color:var(--oro-light);font-family:'Fraunces',serif;font-size:16px;font-weight:700}
 
+/* ── HERO: animación de capas (scroll) ── */
+.hero.has-burger{min-height:100svh;display:flex;align-items:center}
+.hero.has-burger .hero-img{opacity:.16}
+.hero.has-burger .wrap{width:100%;padding-block:clamp(28px,5svh,56px)}
+.hero.has-burger .hero-in{max-width:min(46vw,520px);text-align:left;animation:none}
+.hero.has-burger .hero-cta,.hero.has-burger .hero-facts{justify-content:flex-start}
+.hero.has-burger h1{font-size:clamp(1.9rem,4.2vw,3rem)}
+.burger-stack{
+  position:absolute;right:3%;top:50%;
+  width:min(46vw,calc(78svh*0.626));aspect-ratio:533/850;
+  transform:translateY(-50%);pointer-events:none;z-index:0;
+  filter:drop-shadow(0 18px 16px rgba(0,0,0,.55));
+}
+.burger-stack::after{
+  content:'DESLIZA';position:absolute;bottom:-9%;left:50%;
+  transform:translateX(-50%);font-size:10px;letter-spacing:.25em;
+  color:var(--oro-light);opacity:calc(.55 * var(--hint,1));animation:burgerHint 2.2s ease-in-out infinite;
+}
+@keyframes burgerHint{0%,100%{opacity:.25;transform:translate(-50%,0)}50%{opacity:.75;transform:translate(-50%,5px)}}
+.burger-ly{position:absolute;height:auto;will-change:transform;pointer-events:none;user-select:none}
+.burger-dot{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--oro-light);opacity:.6;animation:burgerFl linear infinite}
+@keyframes burgerFl{from{transform:translateY(0)}to{transform:translateY(-110vh)}}
+@media(max-width:860px){
+  .burger-stack{right:-2%;width:min(46vw,calc(72svh*0.626));opacity:.92}
+  .hero.has-burger .hero-in{max-width:52vw}
+}
+@media(max-width:640px){
+  .hero.has-burger{align-items:flex-start}
+  .hero.has-burger .hero-in{max-width:100%;text-align:center;align-items:center;padding-top:48px}
+  .hero.has-burger .hero-cta,.hero.has-burger .hero-facts{justify-content:center}
+  .hero.has-burger h1{font-size:clamp(1.5rem,6vw,2rem)}
+  .burger-stack{top:54%;right:50%;width:min(78vw,calc(52svh*0.626));transform:translate(50%,-50%);opacity:.85}
+}
+@media(prefers-reduced-motion:reduce){.burger-dot,.burger-stack::after{animation:none}}
+/* ── PRODUCTOS: acento dorado + barrido de brillo ── */
+.grid.gsap-anim>*{will-change:transform,opacity}
+.grid.gsap-anim .card::before{
+  content:'';position:absolute;left:0;right:0;top:0;height:3px;z-index:5;
+  background:linear-gradient(90deg,var(--oro),var(--vino) 55%,var(--oro-light));
+  transform:scaleX(var(--accent,0));transform-origin:0 50%;pointer-events:none;
+}
+.grid.gsap-anim .card::after{
+  content:'';position:absolute;inset:0;z-index:4;pointer-events:none;
+  background:linear-gradient(105deg,transparent 34%,rgba(255,183,61,.30) 47%,rgba(255,246,214,.62) 52%,transparent 66%);
+  background-size:250% 100%;background-position:var(--sweep,100%) 0;opacity:.9;
+}
+#menu .toolbar{will-change:transform,opacity}
+
 /* ============ 7. BUTTONS ============ */
 .btn{
   position:relative;overflow:hidden;
@@ -259,6 +307,8 @@ button.eyebrow:focus-visible{outline:2.5px solid var(--oro-light);outline-offset
 /* ============ 9. PRODUCT GRID ============ */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:var(--gap)}
 .grid.enter>*{animation:fadeUp .55s var(--ease-out) both;animation-delay:calc(var(--i,0)*45ms)}
+.grid.gsap-anim{perspective:1100px}
+.grid.gsap-anim>*{animation:none}
 
 .card{
   position:relative;display:flex;flex-direction:column;
@@ -1490,6 +1540,8 @@ select.status[data-s="Cancelado"]{background-color:var(--bad-bg);color:var(--bad
 <div id="app"></div>
 <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
    GOSTO · Tienda + Panel admin
@@ -2424,6 +2476,77 @@ function render(){
   scrollTop(y);
   if(S.ready) afterRender();
 }
+/* ── HERO: animación de capas con GSAP ScrollTrigger ── */
+const BURGER_LAYERS = [
+  {src:'img/pan-arriba.webp',    left:8.068,  top:-0.235, w:83.865, dx:0,   dy:206,  sx:1.1186, sy:1.0215, z:3},
+  {src:'img/lechuga.webp',       left:-0.375, top:23.529, w:100.75, dx:3,   dy:128,  sx:1.0801, sy:0.8255, z:4},
+  {src:'img/cebolla-salsa.webp', left:12.008, top:46.471, w:75.235, dx:-3,  dy:9,    sx:1.2594, sy:0.7792, z:5},
+  {src:'img/carne.webp',         left:10.319, top:63.647, w:78.799, dx:1.5, dy:-61,  sx:1.2143, sy:0.5917, z:2},
+  {src:'img/pan-abajo.webp',     left:9.756,  top:83.529, w:80.3,   dx:0.5, dy:-172, sx:1.1916, sy:0.7606, z:1},
+];
+let burgerTL = null, burgerIntroDone = false;
+function initBurgerAnim(){
+  if(burgerTL){ try{ burgerTL.scrollTrigger?.kill(); burgerTL.kill(); }catch(e){} burgerTL = null; }
+  const stack = $('#burgerStack'), hero = stack?.closest('.hero');
+  if(!stack || !hero || !window.gsap || !window.ScrollTrigger || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  stack.querySelectorAll('.burger-drip,.burger-drop,.burger-sauce').forEach(el=>el.remove());
+  if(!stack.querySelector('.burger-dot')){
+    for(let i=0;i<22;i++){
+      const d=document.createElement('i'); d.className='burger-dot';
+      d.style.left=(Math.random()*100)+'%'; d.style.top=(60+Math.random()*50)+'%';
+      d.style.animationDuration=(9+Math.random()*10)+'s';
+      d.style.animationDelay=(-Math.random()*12)+'s';
+      stack.appendChild(d);
+    }
+  }
+  if(!stack.querySelector('.burger-ly')){
+    BURGER_LAYERS.forEach(l=>{
+      const im=new Image(); im.className='burger-ly'; im.alt='';
+      im.style.top=l.top+'%'; im.style.left=l.left+'%'; im.style.width=l.w+'%'; im.style.zIndex=l.z;
+      im.src=l.src; stack.appendChild(im);
+    });
+  }
+  const imgs=[...stack.querySelectorAll('.burger-ly')];
+  gsap.registerPlugin(ScrollTrigger);
+  const F=()=>stack.offsetWidth/533;
+  stack.style.setProperty('--hint',1);
+  const tl=gsap.timeline({scrollTrigger:{trigger:hero,start:'top top',end:'+=180%',scrub:1.5,pin:true,invalidateOnRefresh:true}});
+  imgs.forEach((im,i)=>{
+    const l=BURGER_LAYERS[i];
+    tl.fromTo(im,
+      {x:()=>l.dx*F(), y:()=>l.dy*F(), scaleX:l.sx, scaleY:l.sy, transformOrigin:'50% 0%'},
+      {x:0,y:0,scaleX:1,scaleY:1,ease:'sine.inOut',duration:0.6},0);
+  });
+  tl.to('.hero-in',{opacity:0,y:-40,duration:.3,ease:'sine.inOut'},0.08)
+    .to(stack,{'--hint':0,duration:.2,ease:'none'},0)
+    .to(stack,{scale:0.93,opacity:0,duration:0.45,ease:'sine.inOut'},0.92);
+  burgerTL=tl;
+  if(!burgerIntroDone){
+    burgerIntroDone = true;
+    gsap.from(hero.querySelectorAll('.eyebrow, h1, .hero-in>p, .hero-cta .btn, .hero-facts div'), {
+      opacity:0, y:22, duration:.8, stagger:.075, ease:'power3.out', delay:.1, clearProps:'all'
+    });
+  }
+  ScrollTrigger.refresh();
+}
+/* ── MENÚ: entrada fluida de tarjetas al bajar ── */
+let menuTL = null;
+function initMenuAnim(){
+  if(menuTL){ try{ menuTL.scrollTrigger?.kill(); menuTL.kill(); }catch(e){} menuTL = null; }
+  const grid = $('#grid'), menu = $('#menu');
+  if(!grid || !menu || !window.gsap || !window.ScrollTrigger || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cards = [...grid.querySelectorAll('.card')];
+  if(!cards.length) return;
+  grid.classList.add('gsap-anim');
+  cards.forEach(c=>{ c.style.removeProperty('--sweep'); c.style.removeProperty('--accent'); });
+  gsap.set(cards,{clearProps:'transform,opacity,translate,rotate,scale'});
+  gsap.set('#menu .toolbar',{clearProps:'transform,opacity,translate,rotate,scale'});
+  menuTL = gsap.timeline({scrollTrigger:{trigger:menu,start:'top 92%',end:'top 25%',scrub:1.3,invalidateOnRefresh:true}});
+  menuTL.fromTo('#menu .toolbar',{y:40,opacity:0},{y:0,opacity:1,duration:0.35,ease:'sine.out'},0)
+        .fromTo(cards,{rotateX:55,y:110,scale:0.94,opacity:0},{rotateX:0,y:0,scale:1,opacity:1,stagger:0.09,duration:0.75,ease:'sine.out'},0.05)
+        .fromTo(cards,{'--accent':0},{'--accent':1,duration:0.6,stagger:0.09,ease:'sine.out'},0.05)
+        .fromTo(cards,{'--sweep':'100%'},{'--sweep':'0%',duration:0.9,stagger:0.06,ease:'sine.inOut'},0.08);
+}
 function afterRender(){
   if(!(isAdmin && adminOK) && !isEmployee) syncCartBar();
   clearTimeout(availabilityTimer);
@@ -2434,6 +2557,7 @@ function afterRender(){
   },60000-(Date.now()%60000)+150);
   const h = $('#heroImg');
   if(h) h.addEventListener('load', function(){ this.classList.add('ok'); }, { once:true });
+  if(S.ready&&!isAdmin&&!isEmployee){ initBurgerAnim(); initMenuAnim(); }
 }
 function bootView(){
   return `<div class="bootwrap"><div class="bootspin"></div><h1>Cargando ${esc(negocio().nombre)}…</h1>
@@ -2482,10 +2606,11 @@ function storeView(){
     </div>
   </header>
 
-  <section class="hero">
+  <section class="hero has-burger">
     <img class="hero-img" id="heroImg" src="${U(UNSPLASH.hero,1400,760,68)}"
          srcset="${U(UNSPLASH.hero,700,400,68)} 700w, ${U(UNSPLASH.hero,1400,760,68)} 1400w"
          sizes="100vw" alt="" width="1400" height="760" fetchpriority="high" decoding="async">
+    <div class="burger-stack" id="burgerStack" aria-hidden="true"></div>
     <div class="wrap"><div class="hero-in">
       <button class="eyebrow" data-act="emp" title="Panel de vendedor" aria-label="Panel de vendedor"><span class="dot"></span>Hecho al momento</button>
       <h1>Burros y hamburguesas<br>que <em>se melting</em> en la boca.</h1>
@@ -4974,6 +5099,7 @@ function renderGrid(){
   grid.innerHTML = list.length ? list.map((p,i)=>card(p,i)).join('') : `
     <div class="empty"><span class="ico">🍽️</span><h3>Nada por aquí</h3>
     <p>${searchQ ? `No hay resultados para “${esc(searchQ)}”.` : 'Esta categoría está vacía por ahora.'}</p></div>`;
+  if(S.ready&&!isAdmin&&!isEmployee) initMenuAnim();
 }
 
 /* input: buscador, precio, archivo */
