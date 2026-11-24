@@ -190,9 +190,8 @@ button.eyebrow:focus-visible{outline:2.5px solid var(--oro-light);outline-offset
 /* ── HERO: animación de capas (scroll) ── */
 .hero.has-burger{min-height:100svh;display:flex;align-items:center}
 .hero.has-burger .hero-img{opacity:.16}
-.hero.has-burger .wrap{position:relative;z-index:10;width:100%;padding-block:clamp(28px,5svh,56px)}
-.hero.has-burger .eyebrow{position:relative;z-index:11}
-.hero.has-burger .hero-in>p{position:relative;z-index:12}
+.hero.has-burger .wrap{position:relative;width:100%;padding-block:clamp(28px,5svh,56px)}
+.hero.has-burger .eyebrow{position:relative;z-index:10}
 .hero.has-burger .hero-in{max-width:min(46vw,520px);text-align:left;animation:none}
 .hero.has-burger .hero-cta,.hero.has-burger .hero-facts{justify-content:flex-start}
 .hero.has-burger h1{font-size:clamp(1.9rem,4.2vw,3rem)}
@@ -2532,7 +2531,7 @@ function initBurgerAnim(){
       {x:()=>l.dx*F(), y:()=>l.dy*F(), scaleX:l.sx, scaleY:l.sy, transformOrigin:'50% 0%'},
       {x:0,y:0,scaleX:1,scaleY:1,ease:'sine.inOut',duration:0.6},0);
   });
-  tl.to('.hero-in',{opacity:0,y:-40,duration:.3,ease:'sine.inOut'},0.08)
+  tl.to('.hero-in>h1,.hero-in>p,.hero-cta,.hero-facts',{opacity:0,y:-40,duration:.3,ease:'sine.inOut'},0.08)
     .to(stack,{'--hint':0,duration:.2,ease:'none'},0)
     .to(stack,{scale:0.93,opacity:0,duration:0.45,ease:'sine.inOut'},0.92);
   burgerTL=tl;
