@@ -1288,6 +1288,31 @@ select.status[data-s="Cancelado"]{background-color:var(--bad-bg);color:var(--bad
 .adm-dash .span-5{grid-column:span 5}
 .adm-dash .span-12{grid-column:span 12}
 
+/* reportes diarios y semanales */
+.adm-dash .rep-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 16px}
+.adm-dash .rep-switch{display:inline-flex;gap:6px;padding:5px;border-radius:14px;background:rgba(0,0,0,.28);border:1px solid rgba(242,214,143,.16)}
+.adm-dash .rep-switch .chip{padding:7px 15px;font-size:12.5px;border-radius:10px;background:transparent;border-color:transparent;color:rgba(246,233,208,.66)}
+.adm-dash .rep-switch .chip[aria-pressed="true"]{background:linear-gradient(135deg,var(--ad-gold),var(--ad-gold-2));color:#3A0D18;border-color:transparent;box-shadow:0 6px 18px rgba(200,155,60,.28)}
+.adm-dash .rep-head-actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.adm-dash .rep-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}
+.adm-dash .rep-kpi{border:1px solid rgba(242,214,143,.14);border-radius:14px;padding:12px 14px;background:rgba(0,0,0,.24)}
+.adm-dash .rep-kpi span{display:block;font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ad-muted)}
+.adm-dash .rep-kpi b{display:block;margin-top:6px;font-family:'Fraunces',serif;font-size:1.35rem;color:var(--ad-gold-2);font-variant-numeric:tabular-nums}
+.adm-dash .rep-note{font-size:12px;color:var(--ad-muted);margin:12px 0 0;line-height:1.5}
+.adm-dash .rep-days{display:flex;flex-direction:column;gap:9px}
+.adm-dash .rep-day{display:grid;grid-template-columns:minmax(48px,110px) 1fr auto;gap:10px;align-items:center;font-size:12px;color:rgba(246,233,208,.8)}
+.adm-dash .rep-day>i{display:block;height:9px;border-radius:99px;background:rgba(242,214,143,.1);overflow:hidden}
+.adm-dash .rep-day>i>b{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--ad-gold),var(--ad-gold-2))}
+.adm-dash .rep-day>b{color:var(--ad-gold-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.adm-dash .rep-hist{display:flex;flex-direction:column}
+.adm-dash .rep-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid rgba(242,214,143,.1)}
+.adm-dash .rep-row:last-child{border-bottom:0}
+.adm-dash .rep-row .when{flex:1 1 180px;min-width:0}
+.adm-dash .rep-row .when b{display:block;font-size:13px;color:var(--ad-cream)}
+.adm-dash .rep-row .when span{font-size:11px;color:var(--ad-muted)}
+.adm-dash .rep-row .amt{font-family:'Fraunces',serif;color:var(--ad-gold-2);font-size:1.05rem}
+.adm-dash .rep-archived{border-color:rgba(242,214,143,.5);box-shadow:0 0 30px rgba(242,214,143,.14)}
+
 /* gráfica de línea */
 .adm-dash .line-chart{width:100%}
 .adm-dash .line-svg{display:block;width:100%;height:auto;overflow:visible}
@@ -1661,6 +1686,9 @@ let editId=null, ordFilter='Todos', isAdminLogin=false, adminTab='resumen';
 let invFilter='Todos', recipeEditId=null, recipeDraft=null, editMatId=null;
 let eCart={}, eMetodo='efectivo';
 try { eMetodo = localStorage.getItem('gosto_metodo') || 'efectivo'; } catch(e){ eMetodo = 'efectivo'; }
+const KREP = 'gosto_reportes_v1';
+let reportMode='semanal', reportSel=null;
+let reportHistory = (()=>{ try{ const v=JSON.parse(localStorage.getItem(KREP)||'null'); return Array.isArray(v)?v:[]; }catch(e){ return []; } })();
 
 /* ─────────── UTILIDADES ─────────── */
 const $  = s => document.querySelector(s);
@@ -2529,21 +2557,25 @@ function initBurgerAnim(){
   stack.style.setProperty('--hint',1);
   const tl=gsap.timeline({scrollTrigger:{trigger:hero,start:'top top',
     end:()=>matchMedia('(max-width:640px)').matches?'+=140%':'+=180%',
-    scrub:1.5,pin:true,invalidateOnRefresh:true}});
+    scrub:1.5,pin:true,anticipatePin:1,invalidateOnRefresh:true}});
   imgs.forEach((im,i)=>{
     const l=BURGER_LAYERS[i];
     tl.fromTo(im,
       {x:()=>l.dx*F(), y:()=>l.dy*F(), scaleX:l.sx, scaleY:l.sy, transformOrigin:'50% 0%'},
       {x:0,y:0,scaleX:1,scaleY:1,ease:'sine.inOut',duration:0.6},0);
   });
-  tl.to('.hero-in>h1,.hero-in>p,.hero-cta,.hero-facts',{opacity:0,y:-40,duration:.3,ease:'sine.inOut'},0.08)
+  tl.to('.hero-in>h1,.hero-in>p,.hero-cta,.hero-facts',{opacity:0,y:-40,duration:.3,ease:'sine.inOut',overwrite:'auto'},0.08)
+    .to('.hero-in>.eyebrow',{opacity:0,duration:.3,ease:'sine.inOut',overwrite:'auto'},0.08)
     .to(stack,{'--hint':0,duration:.2,ease:'none'},0)
     .to(stack,{scale:0.93,opacity:0,duration:0.45,ease:'sine.inOut'},0.92);
   burgerTL=tl;
   if(!burgerIntroDone){
     burgerIntroDone = true;
-    gsap.from(hero.querySelectorAll('.eyebrow, h1, .hero-in>p, .hero-cta .btn, .hero-facts div'), {
-      opacity:0, y:22, duration:.8, stagger:.075, ease:'power3.out', delay:.1, clearProps:'all'
+    /* Entrada: solo el contenedor. Así no comparte opacity/y con la
+       animación de scroll (que anima h1, p, CTA y datos), y no hay
+       saltos si el usuario baja antes de que termine la intro. */
+    gsap.from(hero.querySelector('.hero-in'), {
+      opacity:0, duration:.9, delay:.08, ease:'power2.out'
     });
   }
   ScrollTrigger.refresh();
@@ -3201,6 +3233,7 @@ const kpi = (label,val,sub,cls) => `<div class="kpi ${cls||''}" style="--i:${cls
 
 const ADMIN_TABS = [
   { id:'resumen',    label:'Resumen',      icon:'chart',  group:'main' },
+  { id:'reportes',   label:'Reportes',     icon:'trend',  group:'main' },
   { id:'gastos',     label:'Gastos',       icon:'wallet', group:'main' },
   { id:'productos',  label:'Productos',    icon:'box',    group:'main', count:() => S.products.length },
   { id:'pedidos',    label:'Ventas',       icon:'bag',    group:'main', count:() => S.orders.filter(o => o.status==='Pendiente').length },
@@ -3289,6 +3322,7 @@ function adminView(){
 
 function adminPanelHTML(){
   switch(adminTab){
+    case 'reportes':   return panelReportes();
     case 'gastos':     return panelGastos();
     case 'pedidos':    return panelPedidos();
     case 'productos':  return panelProductos();
@@ -3340,6 +3374,91 @@ function panelResumen(){
       <div class="acard-b flush" id="recentBox">${recentOrdersHTML()}</div>
     </section>
   </div>`;
+}
+
+/* ─────────── PANEL: REPORTES (DIARIO / SEMANAL) ─────────── */
+function panelReportes(){
+  syncReportHistory();
+  const found = reportSel ? reportHistory.find(r => r.mode===reportMode && r.key===reportSel) : null;
+  if(reportSel && !found) reportSel = null;
+  const r = found || reportSnapshot(reportMode, periodKey(reportMode, new Date()));
+  const archived = !!found;
+  const saved = reportHistory.filter(x => x.mode===reportMode).length;
+  return `
+  <div class="rep-head">
+    <div class="rep-switch" role="group" aria-label="Tipo de reporte">
+      <button class="chip" data-act="repmode" data-v="diario" aria-pressed="${reportMode==='diario'}">Diario</button>
+      <button class="chip" data-act="repmode" data-v="semanal" aria-pressed="${reportMode==='semanal'}">Semanal</button>
+    </div>
+    <div class="rep-head-actions">
+      ${archived ? `<button class="mini-btn" data-act="repcurrent">${I.back} Periodo actual</button>`
+                 : `<button class="mini-btn" data-act="repsave">${I.check} Guardar cierre</button>`}
+    </div>
+  </div>
+
+  <div class="dash-grid" id="repBox">${reportBodyHTML(r, archived)}</div>
+
+  <div class="dash-grid">
+    <section class="acard span-12">
+      <div class="acard-h">
+        <div><h2>Historial guardado</h2><p class="dash-sub">Reportes de ${reportMode==='semanal'?'semanas':'días'} anteriores</p></div>
+        <span class="dash-badge">${saved} guardados</span>
+      </div>
+      <div class="acard-b">${reportHistoryHTML()}</div>
+    </section>
+  </div>`;
+}
+function reportHistoryHTML(){
+  const list = reportHistory.filter(r => r.mode===reportMode).slice(0,40);
+  if(!list.length) return `<div class="chart-empty">Aún no hay cierres guardados. Los periodos anteriores se archivan solos al abrir esta sección, o puedes guardar el periodo actual con «Guardar cierre».</div>`;
+  return `<div class="rep-hist">${list.map(r => `
+    <div class="rep-row">
+      <div class="when"><b>${esc(r.label)}</b><span>${r.pedidos} pedido${r.pedidos===1?'':'s'} · ${r.unidades} unidades · ${money(r.ventas)}</span></div>
+      <button class="mini-btn" data-act="repview" data-k="${esc(r.key)}">${I.eye} Ver reporte</button>
+    </div>`).join('')}</div>`;
+}
+function repKpisHTML(r){
+  const cell = (l,v) => `<div class="rep-kpi"><span>${esc(l)}</span><b>${v}</b></div>`;
+  return `<div class="rep-kpis">
+    ${cell('Ventas', money(r.ventas))}
+    ${cell('Pedidos', r.pedidos)}
+    ${cell('Unidades', r.unidades)}
+    ${cell('Ticket prom.', money(r.ticket))}
+    ${cell('Ganancia', money(r.ganancia))}
+    ${cell('Margen', Math.round(r.margen)+'%')}
+  </div>`;
+}
+function reportBodyHTML(r, archived){
+  const max = Math.max(1, ...(r.days||[]).map(d => d.total));
+  const topP = Math.max(1, ...(r.prods||[]).map(p => p.qty));
+  const bar = (name, w, val) => `<div class="rep-day"><span>${esc(name)}</span><i><b style="width:${Math.round(w)}%"></b></i><b>${val}</b></div>`;
+  const days = reportMode==='semanal'
+    ? `<section class="acard span-7">
+        <div class="acard-h"><div><h2>Ventas por día</h2><p class="dash-sub">Distribución de la semana</p></div></div>
+        <div class="acard-b"><div class="rep-days">${(r.days||[]).map(d => bar(d.label, d.total/max*100, money(d.total))).join('') || '<div class="chart-empty">Sin ventas en este periodo</div>'}</div></div>
+      </section>` : '';
+  return `
+  <section class="acard span-12 ${archived?'rep-archived':''}">
+    <div class="acard-h">
+      <div><h2>${esc(r.label)}</h2><p class="dash-sub">${archived?'Reporte guardado · solo lectura':'Periodo en curso · se actualiza solo'}</p></div>
+      <span class="dash-badge">${reportMode==='semanal'?'Semanal':'Diario'} · ${r.pedidos} pedidos</span>
+    </div>
+    <div class="acard-b">
+      ${repKpisHTML(r)}
+      <p class="rep-note">${reportMode==='semanal'
+        ? 'La semana se reinicia cada lunes. Los cierres de las semanas anteriores quedan guardados en el historial.'
+        : 'El día se reinicia cada medianoche. Los cierres de los días anteriores quedan guardados en el historial.'}</p>
+    </div>
+  </section>
+  ${days}
+  <section class="acard ${reportMode==='semanal'?'span-5':'span-12'}">
+    <div class="acard-h"><div><h2>Ventas por vendedor</h2><p class="dash-sub">Pedidos no cancelados</p></div></div>
+    <div class="acard-b"><div class="rep-days">${(r.emps||[]).map(e => bar(e.name, e.total/Math.max(1,r.ventas)*100, money(e.total))).join('') || '<div class="chart-empty">Sin ventas en este periodo</div>'}</div></div>
+  </section>
+  <section class="acard span-12">
+    <div class="acard-h"><div><h2>Productos más vendidos</h2><p class="dash-sub">Unidades del periodo</p></div></div>
+    <div class="acard-b"><div class="rep-days">${(r.prods||[]).map(p => bar(p.name, p.qty/topP*100, `${p.qty} u · ${money(p.total)}`)).join('') || '<div class="chart-empty">Sin productos en este periodo</div>'}</div></div>
+  </section>`;
 }
 
 /* ─────────── PANEL: GASTOS ─────────── */
@@ -3462,6 +3581,98 @@ function dashboardStats(){
     ticket: valid.length ? total / valid.length : 0,
     week,
   };
+}
+/* ─────────── REPORTES: PERIODOS, CIERRES E HISTORIAL ─────────── */
+function saveReportHistory(){
+  try{ localStorage.setItem(KREP, JSON.stringify(reportHistory.slice(0,120))); }catch(e){}
+}
+function weekStart(d){
+  const x = new Date(d); x.setHours(0,0,0,0);
+  x.setDate(x.getDate() - ((x.getDay()+6)%7));
+  return x;
+}
+function periodKey(mode, d){
+  const x = new Date(d); x.setHours(0,0,0,0);
+  const b = mode==='diario' ? x : weekStart(x);
+  return (mode==='diario'?'d':'s') + ':' + dayKey(b);
+}
+function periodInfo(mode, key){
+  const p = String(key||'').slice(2).split('-').map(Number);
+  const start = new Date(p[0], p[1], p[2]);
+  const end = new Date(start); end.setDate(end.getDate() + (mode==='diario'?1:7));
+  const fmt = d => d.toLocaleDateString('es-CO',{day:'numeric',month:'short',year:'numeric'});
+  const label = mode==='diario'
+    ? start.toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long',year:'numeric'})
+    : `${fmt(start)} al ${fmt(new Date(end.getTime()-1))}`;
+  return { key, start, end, label };
+}
+function reportSnapshot(mode, key){
+  const p = periodInfo(mode, key);
+  const list = S.orders.filter(o => o.status!=='Cancelado' && (()=>{
+    const d = orderDate(o); return d>=p.start && d<p.end;
+  })());
+  const ventas = list.reduce((s,o)=>s+orderTotal(o),0);
+  const unidades = list.reduce((s,o)=>s+orderUnits(o),0);
+  const costo = list.reduce((s,o)=>s+orderCost(o),0);
+  const emps = {}, prods = {};
+  list.forEach(o=>{
+    const name = String(o.employee||o.vendedor||o.empleado||'Caja principal').trim() || 'Caja principal';
+    emps[name] = emps[name] || {name,pedidos:0,total:0};
+    emps[name].pedidos++; emps[name].total += orderTotal(o);
+    (o.items||[]).forEach(i=>{
+      const qty = Math.max(0, Number(i.qty)||0); if(!qty) return;
+      const nm = i.name || prod(i.id)?.name || 'Producto';
+      prods[nm] = prods[nm] || {name:nm,qty:0,total:0};
+      prods[nm].qty += qty; prods[nm].total += qty*(Number(i.price)||0);
+    });
+  });
+  const days = mode==='semanal' ? Array.from({length:7},(_,i)=>{
+    const d = new Date(p.start); d.setDate(d.getDate()+i);
+    const k = dayKey(d);
+    return { key:k, label:d.toLocaleDateString('es-CO',{weekday:'short'}).replace('.',''),
+      total:list.filter(o=>dayKey(orderDate(o))===k).reduce((s,o)=>s+orderTotal(o),0) };
+  }) : [];
+  return {
+    mode, key, label:p.label, from:p.start.getTime(), to:p.end.getTime(), saved:Date.now(),
+    ventas, pedidos:list.length, unidades, ticket:list.length?ventas/list.length:0,
+    costo, ganancia:ventas-costo, margen:ventas?(ventas-costo)/ventas*100:0,
+    emps:Object.values(emps).sort((a,b)=>b.total-a.total),
+    prods:Object.values(prods).sort((a,b)=>b.qty-a.qty||b.total-a.total).slice(0,5),
+    days,
+  };
+}
+function upsertReport(mode, key){
+  const snap = reportSnapshot(mode, key);
+  const i = reportHistory.findIndex(r => r.mode===mode && r.key===key);
+  if(i>=0) reportHistory[i] = snap; else reportHistory.push(snap);
+  reportHistory.sort((a,b)=>(b.from||0)-(a.from||0));
+  reportHistory = reportHistory.slice(0,120);
+  saveReportHistory();
+  return snap;
+}
+function syncReportHistory(){
+  if(!S.ready) return;
+  const now = new Date();
+  let changed = false;
+  for(let i=1;i<=7;i++){
+    const d = new Date(now); d.setDate(d.getDate()-i);
+    const key = periodKey('diario', d);
+    if(reportHistory.some(r=>r.mode==='diario'&&r.key===key)) continue;
+    const snap = reportSnapshot('diario', key);
+    if(snap.pedidos){ reportHistory.push(snap); changed=true; }
+  }
+  for(let i=1;i<=4;i++){
+    const d = weekStart(now); d.setDate(d.getDate()-7*i);
+    const key = periodKey('semanal', d);
+    if(reportHistory.some(r=>r.mode==='semanal'&&r.key===key)) continue;
+    const snap = reportSnapshot('semanal', key);
+    if(snap.pedidos){ reportHistory.push(snap); changed=true; }
+  }
+  if(changed){
+    reportHistory.sort((a,b)=>(b.from||0)-(a.from||0));
+    reportHistory = reportHistory.slice(0,120);
+    saveReportHistory();
+  }
 }
 function topProducts(limit = 5){
   const map = new Map();
@@ -4408,6 +4619,10 @@ function refreshDash(){
   const k = $('#kpis'); if(k) k.innerHTML = kpisForTab(adminTab);
   const banner = $('#dashBanner'); if(banner) banner.innerHTML = salesBannerHTML();
   const line = $('#dashLine'); if(line) line.innerHTML = lineChartHTML();
+  if(adminTab==='reportes' && !reportSel){
+    const rep = $('#repBox');
+    if(rep) rep.innerHTML = reportBodyHTML(reportSnapshot(reportMode, periodKey(reportMode,new Date())), false);
+  }
   const bars = $('#dashBars'); if(bars) bars.innerHTML = barChartHTML(Number(bars.dataset.limit) || 5);
   const emps = $('#dashEmps'); if(emps) emps.innerHTML = employeesHTML();
   const gas = $('#gastosBox'); if(gas) gas.innerHTML = gastosRowsHTML();
@@ -5030,6 +5245,16 @@ document.addEventListener('click', async e => {
     case 'admsideopen': openAdminSide(); break;
     case 'admside': closeAdminSide(); break;
 
+    case 'repmode': reportMode = el.dataset.v==='diario' ? 'diario' : 'semanal'; reportSel = null; render(); break;
+    case 'repview': reportSel = el.dataset.k || null; render(); scrollTop(0); break;
+    case 'repcurrent': reportSel = null; render(); scrollTop(0); break;
+    case 'repsave': {
+      const saved = upsertReport(reportMode, periodKey(reportMode, new Date()));
+      toast('Reporte guardado: ' + saved.label);
+      render();
+      break;
+    }
+
     case 'togg': await toggleProduct(el.dataset.id); break;
     case 'delprod': await deleteProduct(el.dataset.id); break;
     case 'viewprod': openProductView(el.dataset.id); break;
@@ -5118,7 +5343,13 @@ function renderGrid(){
   grid.innerHTML = list.length ? list.map((p,i)=>card(p,i)).join('') : `
     <div class="empty"><span class="ico">🍽️</span><h3>Nada por aquí</h3>
     <p>${searchQ ? `No hay resultados para “${esc(searchQ)}”.` : 'Esta categoría está vacía por ahora.'}</p></div>`;
-  if(S.ready&&!isAdmin&&!isEmployee) initMenuAnim();
+  if(S.ready&&!isAdmin&&!isEmployee){
+    const st = menuTL && menuTL.scrollTrigger;
+    /* Si el menú ya está en pantalla, no reiniciar la entrada: las tarjetas
+       nuevas quedan visibles y no hay un parpadeo al buscar/filtrar. */
+    if(!st || st.progress <= 0.001) initMenuAnim();
+    else ScrollTrigger.refresh();
+  }
 }
 
 /* input: buscador, precio, archivo */
